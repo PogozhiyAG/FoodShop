@@ -11,4 +11,6 @@ public class FoodShopDbContext : DbContext
 
     public DbSet<ProductCategory> ProductCategories { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<BasketItem> BasketItems { get; set; }
+    public DbSet<Basket> Baskets { get; set; }
 }

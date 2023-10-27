@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  foodshop.web:
+    image: ${DOCKER_REGISTRY-}foodshopweb
+    build:
+      context: .
+      dockerfile: FoodShop.Web/Dockerfile
+    networks:
+      - foodshopnetwork
+
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - SA_PASSWORD=Pass@word
+      - ACCEPT_EULA=Y
+    ports:
+      - "5433:1433"
+    networks:
+      - foodshopnetwork
+
+  basketdata:
+    image: redis:alpine
+    networks:
+      - foodshopnetwork
+
+networks:
+  foodshopnetwork:

@@ -2,15 +2,24 @@ using FoodShop.Infrastructure.Data;
 using FoodShop.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddDbContext<ApplicationIdentityDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection")));
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
+builder.Services.AddDefaultIdentity<IdentityUser>(options => {
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 1;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+})
+.AddEntityFrameworkStores<ApplicationIdentityDbContext>();
 
 builder.Services.AddDbContext<FoodShopDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -53,3 +62,8 @@ using (var scope = app.Services.CreateScope())
 
 
 app.Run();
+
+
+
+
+

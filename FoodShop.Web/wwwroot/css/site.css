@@ -20,3 +20,19 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+.product-category__container{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.product-category__item {
+    width: 200px;
+    padding: 20px;
+    font-size: 1.5rem;
+    background-color: #f5f5f5;
+    text-decoration: none;
+    color: #555;
+}
