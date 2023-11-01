@@ -12,25 +12,39 @@ namespace FoodShop.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly FoodShopDbContext  _dbContext;
-        private readonly IProductPriceCalculator _productPriceCalculator;
+        private readonly IProductPriceStrategyProvider _productPriceStrategyProvider;
+        private readonly IUserTokenProvider _userTokenProvider;
 
-        public HomeController(ILogger<HomeController> logger, FoodShopDbContext dbContext, IProductPriceCalculator productPriceCalculator)
+        public HomeController(ILogger<HomeController> logger, FoodShopDbContext dbContext, IProductPriceStrategyProvider productPriceStrategyProvider, IUserTokenProvider userTokenProvider)
         {
             _logger = logger;
             _dbContext = dbContext;
-            _productPriceCalculator = productPriceCalculator;
+            _productPriceStrategyProvider = productPriceStrategyProvider;
+            _userTokenProvider = userTokenProvider;
         }
 
         public IActionResult Index()
         {
             var model = new HomeIndexModel();
+
+            var tokenTypeIds = _userTokenProvider.GetUserTokens()
+                .Select(x => x.TokenTypeId)
+                .Concat(new[] { Guid.Empty })
+                .Distinct()
+                .ToList();
+
             model.ProductCategories = _dbContext.ProductCategories
                 .Where(c => c.ParentCategory == null)
                 .ToList();
-            model.Products = _dbContext.Products
+            model.ProductCards = _dbContext.Products
                 .Include(p => p.Tags)
                     .ThenInclude(r => r.Tag)
                 //.Take(30)
+                .Select(p => new ProductCardModel()
+                {
+                    Product = p,
+                    Offers = _productPriceStrategyProvider.GetStrategyLinks(p, tokenTypeIds)
+                })
                 .ToList();
             return View(model);
         }

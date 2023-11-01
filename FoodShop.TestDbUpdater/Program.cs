@@ -247,7 +247,7 @@ db.SaveChanges();
 var ps_0_95 = new ProductPriceStrategy() { Quantity = 1, Rate = 0.95M, Name= "5% off" };
 var ps_2_90 = new ProductPriceStrategy() { Quantity = 2, Rate = 0.90M, Name= "10% off for 2" };
 var ps_0_97 = new ProductPriceStrategy() { Quantity = 1, Rate = 0.97M, Name= "3% off" };
-var ps_2_85 = new ProductPriceStrategy() { Quantity = 2, Rate = 0.85M, Name = "15% off" };
+var ps_2_85 = new ProductPriceStrategy() { Quantity = 2, Rate = 0.85M, Name = "15% off for 2" };
 db.AddRange(ps_0_95, ps_2_90, ps_0_97, ps_2_85);
 db.SaveChanges();
 

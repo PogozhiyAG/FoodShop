@@ -19,12 +19,13 @@
         Filter area
     </div>
     <div class="product__container">
-        @foreach (var product in Model.Products)
+        @foreach (var productCard in Model.ProductCards)
         {
-            <div class="product__item" data-product-id="@product.Id">
-                <div> @product.Name</div>
-                <div> @product.Price</div>
-                <div>@string.Join(", ", product.Tags.Select(t => t.Tag.Name).ToArray())</div>
+            <div class="product__item" data-product-id="@productCard.Product.Id">
+                <div> @productCard.Product.Name</div>
+                <div> @productCard.Product.Price</div>
+                <div>@string.Join(", ", productCard.Product.Tags.Select(t => t.Tag.Name).ToArray())</div>
+                <div>@string.Join(", ", productCard.Offers.Where(l => l != FoodShop.Core.Models.ProductPriceStrategyLink.Default).Select(l => l.ProductPriceStrategy.Name).ToArray())</div>
                 <button class="btn-action-add">Add to Cart</button>
                 <button class="btn-action-remove">Remove from Cart</button>
                 <span class="basket__item-quantity"></span>
