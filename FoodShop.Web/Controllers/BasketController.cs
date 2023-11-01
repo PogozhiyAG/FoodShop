@@ -1,15 +1,55 @@
-﻿using Azure.Core;
+﻿using FoodShop.Web.Models;
+using FoodShop.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodShop.Web.Controllers
 {
     public class BasketController : Controller
     {
+        private readonly IBasketService _basketService;
+        private readonly IOrderCalculator _orderCalculator;
+
+        public BasketController(IBasketService basketService, IOrderCalculator orderCalculator)
+        {
+            _basketService = basketService;
+            _orderCalculator = orderCalculator;
+        }
+
         public IActionResult Index()
         {
-            GetOrCreateBasketCookie();
-            return View();
+            var basketId = GetOrCreateBasketCookie();
+            var basket = _basketService.GetBasket(basketId);
+            var basketModel = _orderCalculator.Calculate(basket);
+            return View(basketModel);
         }
+
+
+        public IActionResult GetBasket()
+        {
+            var basketId = GetOrCreateBasketCookie();
+            var basket = _basketService.GetBasket(basketId);
+            var basketModel = _orderCalculator.Calculate(basket);
+            return Ok(basketModel);
+        }
+
+        public IActionResult SetBasketItem(Guid productId, int quantity)
+        {
+            var basketId = GetOrCreateBasketCookie();
+            _basketService.SetItem(basketId, productId, quantity);
+            var basket = _basketService.GetBasket(basketId);
+            var basketModel = _orderCalculator.Calculate(basket);
+            return Ok(basketModel);
+        }
+
+        public IActionResult AddBasketItem(Guid productId, int quantity)
+        {
+            var basketId = GetOrCreateBasketCookie();
+            _basketService.AddItem(basketId, productId, quantity);
+            var basket = _basketService.GetBasket(basketId);
+            var basketModel = _orderCalculator.Calculate(basket);
+            return Ok(basketModel);
+        }
+
 
         private string GetOrCreateBasketCookie()
         {

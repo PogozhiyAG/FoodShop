@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FoodShop.Core.Models;
 
-namespace FoodShop.Core.Models
+public class Basket: EntityBase
 {
-    public class Basket
+    public string OwnerId { get; set; }
+    public List<BasketItem> Items { get; set; } = new ();
+    public void RemoveEmptyItems()
     {
-        public string Id { get; set; }
-        public List<BasketItem> Items { get; set; } = new ();
-
+        Items.RemoveAll(i => i.Quantity == 0);
     }
 }

@@ -25,14 +25,31 @@ body {
 .product-category__container{
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    justify-content: center;
+    gap: 12px;
+    margin: 32px;
 }
 
 .product-category__item {
-    width: 200px;
+    width: 250px;
+    height: 100px;
     padding: 20px;
     font-size: 1.5rem;
     background-color: #f5f5f5;
     text-decoration: none;
     color: #555;
+}
+
+.product__container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.product__item {
+    width: 250px;
+    height: 350px;
+    padding: 20px;
+    box-shadow: 0 4px 8px 2px #eee;
 }

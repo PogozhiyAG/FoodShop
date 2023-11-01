@@ -1,7 +1,34 @@
-﻿
+﻿@model BasketModel
+
 @{
     ViewData["Title"] = "Basket";
 }
 
 <h1>Basket</h1>
 
+<table style="width: 100%">
+@foreach(var item in Model.Items){
+        var defaultAmount = item.Price * item.Quantity;
+        var calculatedAmount = item.CalculatedPrice;
+        var offerDesc = item.ProductPriceStrategyLink.ProductPriceStrategy.Name;
+        var tokenDesc = "";
+        if (item.ProductPriceStrategyLink.TokenType != null)
+        {
+            tokenDesc = item.ProductPriceStrategyLink.TokenType!.Code;
+        }
+
+    <tr>
+            <td>@item.ProductName</td>
+            <td>@item.Quantity</td>
+            <td style="text-align: right">@item.Price</td>
+            <td style="text-align: right">@defaultAmount</td>
+            <td style="text-align: right">@calculatedAmount</td>
+            <td style="text-align: right">@offerDesc</td>
+            <td style="text-align: right">@tokenDesc</td>
+    </tr>
+}
+</table>
+
+<div style="text-align: right">
+    <h2>@Model.TotalAmount</h2>
+</div>

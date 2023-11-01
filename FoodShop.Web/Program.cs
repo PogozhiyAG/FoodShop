@@ -1,8 +1,8 @@
 using FoodShop.Infrastructure.Data;
 using FoodShop.Web.Data;
+using FoodShop.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,12 +20,23 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => {
 
 builder.Services.AddDbContext<FoodShopDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpContextAccessor();
+
+
+builder.Services.AddScoped<IUserTokenProvider, UserTokenProvider>();
+builder.Services.AddScoped<IBasketService, BasketService>();
+builder.Services.AddScoped<IOrderCalculator, OrderCalculator>();
+builder.Services.AddScoped<IProductPriceCalculator, ProductPriceCalculator>();
+builder.Services.AddScoped<IProductPriceStrategyProvider, ProductPriceStrategyProvider>();
+
 
 var app = builder.Build();
+
+
+
 
 
 if (app.Environment.IsDevelopment())
