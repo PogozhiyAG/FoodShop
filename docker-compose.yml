@@ -9,6 +9,14 @@ services:
     networks:
       - foodshopnetwork
 
+  foodshop.api.catalog:
+    image: ${DOCKER_REGISTRY-}foodshopapicatalog
+    build:
+      context: .
+      dockerfile: FoodShop.Api.Catalog/Dockerfile
+    networks:
+      - foodshopnetwork
+
   sqldata:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:

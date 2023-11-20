@@ -3,11 +3,12 @@
     "Docker Compose": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
-      "serviceActions": {
-        "foodshop.web": "StartDebugging",
-        "sqldata": "StartWithoutDebugging",
-        "basketdata": "StartWithoutDebugging"
-      }
+        "serviceActions": {
+            "foodshop.api.catalog": "StartDebugging",
+            "foodshop.web": "StartDebugging",
+            "sqldata": "StartWithoutDebugging",
+            "basketdata": "StartWithoutDebugging"
+        }
     }
   }
 }
