@@ -34,7 +34,7 @@ public class ProductPriceCalculator : IProductPriceCalculator
 
         var tokenTypeIds = _userTokenProvider.GetUserTokens()
             .Select(x => x.TokenTypeId)
-            .Concat(new[] { Guid.Empty });
+            .Concat(new[] { 0 });
 
         foreach (var strategyLink in _productPriceStrategyProvider.GetStrategyLinks(product, tokenTypeIds))
         {

@@ -2,12 +2,13 @@
 using FoodShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.Linq;
 
 namespace FoodShop.Web.Services;
 
 public interface IProductPriceStrategyProvider
 {
-    IEnumerable<ProductPriceStrategyLink> GetStrategyLinks(Product product, IEnumerable<Guid> tokenTypeIds);
+    IEnumerable<ProductPriceStrategyLink> GetStrategyLinks(Product product, IEnumerable<int> tokenTypeIds);
 }
 
 public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
@@ -21,43 +22,92 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
         _cache = cache;
     }
 
-    public IEnumerable<ProductPriceStrategyLink> GetStrategyLinks(Product product, IEnumerable<Guid> tokenTypeIds)
-    {
-        yield return ProductPriceStrategyLink.Default;
 
-        var strategyLinks = GetProductPriceStrategyLinksDictionary();
+
+    public ProductPriceStrategyLink GetStrategy(Product product, IEnumerable<int> tokenTypeIds)
+    {
+        var strategies = GetStrategies();
 
         foreach (var tokenTypeId in tokenTypeIds)
         {
-            if (strategyLinks.TryGetValue(tokenTypeId, out var innerDir))
+            foreach (var referenceId in GetReferencesFromProduct(product))
             {
-                foreach (var reference in GetReferencesFromProduct(product))
+                var key = new ValueTuple<int, int>(tokenTypeId, referenceId);
+                if(strategies.TryGetValue(key, out var value))
                 {
-                    if (innerDir.TryGetValue(reference, out var strategyLink))
-                    {
-                        yield return strategyLink;
-                    }
+                    return value;
                 }
             }
         }
+
+        return ProductPriceStrategyLink.Default;
     }
 
-    private IEnumerable<Guid> GetReferencesFromProduct(Product product)
+    private Dictionary<(int, int), ProductPriceStrategyLink> GetStrategies()
+    {
+        if (_cache.TryGetValue(nameof(GetProductPriceStrategyLinks), out Dictionary<(int, int), ProductPriceStrategyLink>? value))
+        {
+            return value!;
+        }
+
+        var result = _context.ProductPriceStrategyLinks.AsNoTracking()
+            .Include(s => s.ProductPriceStrategy)
+            .Include(s => s.TokenType)
+            .ToDictionary(s => new ValueTuple<int, int>(s.TokenTypeId.HasValue ? s.TokenTypeId.Value : 0, s.ReferenceId));
+
+        _cache.Set(nameof(GetStrategies), result, new MemoryCacheEntryOptions()
+        {
+            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
+        });
+
+        return result;
+    }
+
+
+    private IEnumerable<int> GetReferencesFromProduct(Product product)
     {
         yield return product.Id;
+
+        foreach (var tag in product.Tags.Select(r => r.Tag).OrderByDescending(t => t.OfferPriority))
+        {
+            yield return tag.Id;
+        }
         if (product.CategoryId.HasValue)
         {
             yield return product.CategoryId.Value;
         }
-        foreach (var tagRef in product.Tags)
-        {
-            yield return tagRef.TagId;
-        }
     }
 
-    private Dictionary<Guid, Dictionary<Guid, ProductPriceStrategyLink>> GetProductPriceStrategyLinksDictionary()
+
+
+    public IEnumerable<ProductPriceStrategyLink> GetStrategyLinks(Product product, IEnumerable<int> tokenTypeIds)
     {
-        if (_cache.TryGetValue(nameof(GetProductPriceStrategyLinksDictionary), out Dictionary<Guid, Dictionary<Guid, ProductPriceStrategyLink>> value))
+        yield return GetStrategy(product, tokenTypeIds);
+        //yield return GetStrategyLink(product, tokenTypeIds);
+        //yield return ProductPriceStrategyLink.Default;
+
+        //var strategyLinks = GetProductPriceStrategyLinksDictionary();
+
+        //foreach (var tokenTypeId in tokenTypeIds)
+        //{
+        //    if (strategyLinks.TryGetValue(tokenTypeId, out var innerDir))
+        //    {
+        //        foreach (var reference in GetReferencesFromProduct(product))
+        //        {
+        //            if (innerDir.TryGetValue(reference, out var strategyLink))
+        //            {
+        //                yield return strategyLink;
+        //            }
+        //        }
+        //    }
+        //}
+    }
+
+
+
+    private Dictionary<int, Dictionary<int, ProductPriceStrategyLink>> GetProductPriceStrategyLinksDictionary()
+    {
+        if (_cache.TryGetValue(nameof(GetProductPriceStrategyLinksDictionary), out Dictionary<int, Dictionary<int, ProductPriceStrategyLink>> value))
         {
             return value!;
         }
@@ -68,14 +118,14 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
             .AsNoTracking()
             .ToList();
 
-        var result = new Dictionary<Guid, Dictionary<Guid, ProductPriceStrategyLink>>();
+        var result = new Dictionary<int, Dictionary<int, ProductPriceStrategyLink>>();
 
         foreach (var strategyLink in strategyLinks)
         {
-            Guid tokenId = strategyLink.TokenTypeId ?? Guid.Empty;
+            int tokenId = strategyLink.TokenTypeId ?? 0;
             if (!result.TryGetValue(tokenId, out var tokenDic))
             {
-                result[tokenId] = tokenDic = new Dictionary<Guid, ProductPriceStrategyLink>();
+                result[tokenId] = tokenDic = new Dictionary<int, ProductPriceStrategyLink>();
             }
 
             tokenDic[strategyLink.ReferenceId] = strategyLink;
@@ -88,4 +138,82 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
         return result;
     }
+
+
+
+
+    /*
+     ////////////////////////////////////////////////////////////
+    */
+
+
+
+
+    public ProductPriceStrategyLink GetStrategyLink(Product product, IEnumerable<int> tokenTypeIds)
+    {
+        var links = GetProductPriceStrategyLinks();
+
+        tokenTypeIds.Contains(0);
+
+        var q = links
+            .Where(l => l.ReferenceId == product.Id && (l.TokenType == null || tokenTypeIds.Contains(l.TokenTypeId!.Value)))
+            .OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
+            .FirstOrDefault();
+        if (q != null)
+        {
+            return q;
+        }
+
+
+        foreach (var tagRef in product.Tags)
+        {
+            q = links
+            .Where(l => l.ReferenceId == tagRef.TagId && (l.TokenType == null || tokenTypeIds.Contains(l.TokenTypeId!.Value)))
+            .OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
+            .FirstOrDefault();
+            if (q != null)
+            {
+                return q;
+            }
+        }
+
+        q = links
+           .Where(l => product.CategoryId.HasValue && l.ReferenceId == product.CategoryId.Value && (l.TokenType == null || tokenTypeIds.Contains(l.TokenTypeId!.Value)))
+           .OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
+           .FirstOrDefault();
+        if (q != null)
+        {
+            return q;
+        }
+
+
+
+        return ProductPriceStrategyLink.Default;
+    }
+
+
+    private List<ProductPriceStrategyLink> GetProductPriceStrategyLinks()
+    {
+        if (_cache.TryGetValue(nameof(GetProductPriceStrategyLinks), out List<ProductPriceStrategyLink>? value))
+        {
+            return value!;
+        }
+
+        var result = _context.ProductPriceStrategyLinks.AsNoTracking()
+            .Include(s => s.ProductPriceStrategy)
+            .Include(s => s.TokenType)
+            .ToList();
+
+
+        _cache.Set(nameof(GetProductPriceStrategyLinks), result, new MemoryCacheEntryOptions()
+        {
+            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
+        });
+
+        return result;
+    }
+
+
+
+
 }

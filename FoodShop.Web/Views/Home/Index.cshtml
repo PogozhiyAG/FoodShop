@@ -11,25 +11,18 @@
         @foreach (var productCategory in Model.ProductCategories)
         {
             <a href="#" class="product-category__item">
-                @productCategory.Name
+                @productCategory.ProductCategory.Name
             </a>
         }
     </div>
-    <div>
-        Filter area
+    <div class="product-filter__container">
+        <input id="#input-search" placeholder="search the product"/>
     </div>
     <div class="product__container">
         @foreach (var productCard in Model.ProductCards)
         {
-            <div class="product__item" data-product-id="@productCard.Product.Id">
-                <div> @productCard.Product.Name</div>
-                <div> @productCard.Product.Price</div>
-                <div>@string.Join(", ", productCard.Product.Tags.Select(t => t.Tag.Name).ToArray())</div>
-                <div>@string.Join(", ", productCard.Offers.Where(l => l != FoodShop.Core.Models.ProductPriceStrategyLink.Default).Select(l => l.ProductPriceStrategy.Name).ToArray())</div>
-                <button class="btn-action-add">Add to Cart</button>
-                <button class="btn-action-remove">Remove from Cart</button>
-                <span class="basket__item-quantity"></span>
-            </div>
+            await Html.RenderPartialAsync("_ProductCard", productCard);
         }
     </div>
+    <button class="btn-action-load-more">Load more...</button>
 </div>

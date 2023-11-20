@@ -8,10 +8,10 @@ namespace FoodShop.Core.Models
 {
     public class ProductTagRelation
     {
-        public Guid ProductId { get; set; }
+        public int ProductId { get; set; }
         public Product Product { get; set; }
 
-        public Guid TagId { get; set; }
+        public int TagId { get; set; }
         public Tag Tag { get; set; }
     }
 }

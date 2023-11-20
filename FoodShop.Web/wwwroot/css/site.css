@@ -48,8 +48,30 @@ body {
 }
 
 .product__item {
+    position: relative;
     width: 250px;
     height: 350px;
     padding: 20px;
     box-shadow: 0 4px 8px 2px #eee;
+}
+
+.product__item_tag {
+    display: inline-block;
+    padding: 3px 6px;
+    background-color: lightgreen;
+    color: darkgreen;
+    text-transform: lowercase;
+    border-radius: 1px 7px 7px 1px;
+    font-weight: 600;
+    position: absolute;
+    left: 0;
+    top: 15px;
+    font-size: 0.7em;
+}
+
+.product-filter__container{
+    padding: 20px;
+}
+
+.basket__total-amount {
 }

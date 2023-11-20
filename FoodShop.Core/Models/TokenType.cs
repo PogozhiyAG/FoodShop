@@ -10,5 +10,6 @@ namespace FoodShop.Core.Models
     {
         public string Code { get; set; }
         public string? Decription { get; set; }
+        public decimal OfferPriority { get; set; }
     }
 }

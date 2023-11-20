@@ -32,7 +32,7 @@ namespace FoodShop.Web.Controllers
             return Ok(basketModel);
         }
 
-        public IActionResult SetBasketItem(Guid productId, int quantity)
+        public IActionResult SetBasketItem(int productId, int quantity)
         {
             var basketId = GetOrCreateBasketCookie();
             _basketService.SetItem(basketId, productId, quantity);
@@ -41,7 +41,7 @@ namespace FoodShop.Web.Controllers
             return Ok(basketModel);
         }
 
-        public IActionResult AddBasketItem(Guid productId, int quantity)
+        public IActionResult AddBasketItem(int productId, int quantity)
         {
             var basketId = GetOrCreateBasketCookie();
             _basketService.AddItem(basketId, productId, quantity);

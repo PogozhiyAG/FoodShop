@@ -27,7 +27,8 @@ builder.Services.AddHttpContextAccessor();
 
 
 builder.Services.AddScoped<IUserTokenProvider, UserTokenProvider>();
-builder.Services.AddScoped<IBasketService, BasketService>();
+//builder.Services.AddScoped<IBasketService, BasketService>();
+builder.Services.AddScoped<IBasketService, RedisBasketService>();
 builder.Services.AddScoped<IOrderCalculator, OrderCalculator>();
 builder.Services.AddScoped<IProductPriceCalculator, ProductPriceCalculator>();
 builder.Services.AddScoped<IProductPriceStrategyProvider, ProductPriceStrategyProvider>();
