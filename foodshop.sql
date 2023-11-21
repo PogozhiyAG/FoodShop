@@ -70,3 +70,17 @@ sp_help 'dbo.Products'
   group by BrandId
   having count(*) > 10
   order by a desc
+
+
+
+
+
+  insert tags([Name], [Description], [OfferPriority])
+  select
+    [Name] = 'XMas', 
+    [Description] = 'XMas', 
+    [OfferPriority] = 100
+
+  insert [dbo].[ProductTagRelations]([ProductId], [TagId])
+            select [ProductId] = 100, [TagId] = 1
+  union all select [ProductId] = 200, [TagId] = 1
