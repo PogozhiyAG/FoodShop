@@ -23,25 +23,11 @@ namespace FoodShop.Api.Catalog.Controllers
             int? brandId,
             int? tagId,
             string? text,
-            int? pageSize,
-            int? pageNumber,
+            int? skip,
+            int? take,
             ProductSortType? sort
         )
         {
-            //var q = tagId.HasValue
-            //    ? _db.ProductTagRelations.AsNoTracking()
-            //        .Where(r => r.TagId == tagId)
-            //        .Include(r => r.Product)
-            //            .ThenInclude(r => r.Brand)
-            //        .Include(r => r.Product)
-            //            .ThenInclude(r => r.Category)
-            //        .Include(r => r.Tag)
-            //        .Select(r => r.Product)
-            //    : _db.Products.AsNoTracking()
-            //        .Include(p => p.Tags)
-            //        .Include(p => p.Brand)
-            //        .Include(p => p.Category);
-
             var q = _db.Products.AsNoTracking();
 
             if (tagId.HasValue)
@@ -56,41 +42,36 @@ namespace FoodShop.Api.Catalog.Controllers
             {
                 q = q.Where(p => p.BrandId == brandId.Value);
             }
-            //if (tagId.HasValue)
-            //{
-            //    q = q.Where(p => p.Tags);
-            //}
+
             if (!sort.HasValue)
             {
                 sort = ProductSortType.Popularity;
             }
             switch (sort)
             {
-                case ProductSortType.Popularity: q = q.OrderByDescending(p => p.Popularity); break;
-                case ProductSortType.CustomerRank: q = q.OrderByDescending(p => p.CustomerRating); break;
-                case ProductSortType.Price: q = q.OrderByDescending(p => p.Price); break;
+                case ProductSortType.Popularity: q = q.OrderByDescending(p => p.Popularity).ThenByDescending(p => p.Id); break;
+                case ProductSortType.CustomerRank: q = q.OrderByDescending(p => p.CustomerRating).ThenByDescending(p => p.Id); break;
+                case ProductSortType.Price: q = q.OrderByDescending(p => p.Price).ThenByDescending(p => p.Id); break;
             }
 
-            if (!pageSize.HasValue)
+            if (!skip.HasValue)
             {
-                pageSize = 30;
+                skip = 0;
             }
-            if (!pageNumber.HasValue)
+            if (!take.HasValue)
             {
-                pageNumber = 0;
+                take = 30;
             }
 
-            q = q.Skip(pageSize.Value * pageNumber.Value);
-            q = q.Take(pageSize.Value);
 
-            q = q.Include(p => p.Tags).ThenInclude(tr => tr.Tag);
-            q = q.Include(p => p.Brand);
-            q = q.Include(p => p.Category);
+            q = q.Skip(skip.Value);
+            q = q.Take(take.Value);
 
             return Ok(
                 q.Select(p => new {
                     p.Id,
                     p.Name,
+                    p.Description,
                     Brand = new {
                         p.Brand.Id,
                         p.Brand.Name

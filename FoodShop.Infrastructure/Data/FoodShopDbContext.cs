@@ -23,15 +23,15 @@ public class FoodShopDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Product>().HasIndex("Price");
-        modelBuilder.Entity<Product>().HasIndex("Popularity");
-        modelBuilder.Entity<Product>().HasIndex("CustomerRating");
-        modelBuilder.Entity<Product>().HasIndex("CategoryId","Price");
-        modelBuilder.Entity<Product>().HasIndex("CategoryId","Popularity");
-        modelBuilder.Entity<Product>().HasIndex("CategoryId", "CustomerRating");
-        modelBuilder.Entity<Product>().HasIndex("BrandId", "Price");
-        modelBuilder.Entity<Product>().HasIndex("BrandId", "Popularity");
-        modelBuilder.Entity<Product>().HasIndex("BrandId", "CustomerRating");
+        modelBuilder.Entity<Product>().HasIndex("Price", "Id");
+        modelBuilder.Entity<Product>().HasIndex("Popularity", "Id");
+        modelBuilder.Entity<Product>().HasIndex("CustomerRating", "Id");
+        modelBuilder.Entity<Product>().HasIndex("CategoryId","Price", "Id");
+        modelBuilder.Entity<Product>().HasIndex("CategoryId","Popularity", "Id");
+        modelBuilder.Entity<Product>().HasIndex("CategoryId", "CustomerRating", "Id");
+        modelBuilder.Entity<Product>().HasIndex("BrandId", "Price", "Id");
+        modelBuilder.Entity<Product>().HasIndex("BrandId", "Popularity", "Id");
+        modelBuilder.Entity<Product>().HasIndex("BrandId", "CustomerRating", "Id");
 
         modelBuilder.Entity<Basket>().HasIndex(b => b.OwnerId);
 
