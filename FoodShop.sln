@@ -13,7 +13,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.TestDbUpdater", "F
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{671F55D4-EA75-4DEE-A406-04A9959497BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodShop.Api.Catalog", "FoodShop.Api.Catalog\FoodShop.Api.Catalog.csproj", "{25253506-7F12-491E-AA34-7A36739B3BFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Catalog", "FoodShop.Api.Catalog\FoodShop.Api.Catalog.csproj", "{25253506-7F12-491E-AA34-7A36739B3BFD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6EC74503-F7F6-4C9E-957E-08CA90F2BC70}"
+	ProjectSection(SolutionItems) = preProject
+		sqlserver-fulltext.Dockerfile = sqlserver-fulltext.Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

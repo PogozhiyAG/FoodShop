@@ -18,12 +18,14 @@ services:
       - foodshopnetwork
 
   sqldata:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      - MSSQL_SA_PASSWORD=Pass@word
-      - ACCEPT_EULA=Y
+    container_name: sqlserverft
+    build:
+      dockerfile: sqlserver-fulltext.Dockerfile
     ports:
       - "5433:1433"
+    environment:
+      SA_PASSWORD: "Pass@word"
+      ACCEPT_EULA: "Y"
     networks:
       - foodshopnetwork
 

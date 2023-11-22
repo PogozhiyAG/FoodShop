@@ -73,14 +73,14 @@ sp_help 'dbo.Products'
 
 
 
-  select * from tags
+  select * from tags 
 
   insert tags([Name], [Description], [OfferPriority])
             select [Name] = 'XMas', [Description] = 'Christmas',  [OfferPriority] = 100
   union all select [Name] = 'Health', [Description] = 'Health',  [OfferPriority] = 50
 
   insert [dbo].[ProductTagRelations]([ProductId], [TagId])
-            select [ProductId] = 100, [TagId] = 1
-  union all select [ProductId] = 100, [TagId] = 2
-  union all select [ProductId] = 300, [TagId] = 2
+            select [ProductId] = 100, [TagId] = 3
+  union all select [ProductId] = 100, [TagId] = 4
+  union all select [ProductId] = 300, [TagId] = 4
 
