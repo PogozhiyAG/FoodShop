@@ -30,6 +30,11 @@ namespace FoodShop.Api.Catalog.Controllers
         {
             var q = _db.Products.AsNoTracking();
 
+            if (!String.IsNullOrEmpty(text))
+            {
+                q = q.Where(p => EF.Functions.Contains(p.Name, text));
+            }
+
             if (tagId.HasValue)
             {
                 q = q.Where(p => p.Tags.Any(tr => tr.TagId == tagId));
