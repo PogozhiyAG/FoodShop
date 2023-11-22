@@ -94,4 +94,4 @@ sp_help 'dbo.Products'
   from
     Products
 where
-  freetext(Name, '"rose ~ wine"')
+  freetext(Name, '"rose"')
