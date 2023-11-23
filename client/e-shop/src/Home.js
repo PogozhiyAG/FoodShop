@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -13,6 +14,19 @@ const Home = () => {
   return (
     <>
       <h1>Home</h1>
+      <nav>
+        <ul>          
+          <li>
+            <Link to="/category">Category</Link>
+          </li>
+          <li>
+            <Link to="/product">Product</Link>
+          </li>
+          <li>
+            <Link to="/basket">Basket</Link>
+          </li>
+        </ul>
+      </nav>
       {products.map(i => <div>{i.name}</div>)}
     </>
   );
