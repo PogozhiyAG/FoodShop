@@ -1,9 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from './context/AuthContext';
+import Layout from './Layout';
 import Category from './Category';
 import Product from './Product';
-import Layout from './Layout';
 import Home from './Home';
 import NoPage from './NoPage';
 import Basket from './Basket'
@@ -11,7 +11,7 @@ import Basket from './Basket'
 
 const App = () => {
   return (    
-    <React.StrictMode>
+    
       <AuthProvider>
         <BrowserRouter>
           <Routes>
@@ -25,7 +25,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       </AuthProvider>
-    </React.StrictMode>
+    
   );
 }
 
