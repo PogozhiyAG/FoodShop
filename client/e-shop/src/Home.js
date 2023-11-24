@@ -14,25 +14,27 @@ const Home = () => {
 
   return (
     <>
-      <header style={{display: "flex", alignItems: "center", gap: "16px"}}>
-        <img src="logo.png" style={{width: '50px', height: '50px'}}/>
-        <h1 style={{margin: 0}}>Home</h1>
-      </header>
-      <nav>
-        <ul>          
-          <li>
-            <Link to="/category">Category</Link>
-          </li>
-          <li>
-            <Link to="/product">Product</Link>
-          </li>
-          <li>
-            <Link to="/basket">Basket</Link>
-          </li>
-        </ul>
+     
+      <nav className="navbar navbar-expand-lg fixed-top bg-light">
+        <div className="container-fluid">
+          <img src="logo.png" style={{width: '50px', height: '50px'}}/>
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">          
+            <li className="nav-item">
+              <Link to="/category" className="nav-link">Category</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/product" className="nav-link">Product</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/basket" className="nav-link">Basket</Link>
+            </li>
+          </ul>
+        </div>
       </nav>
       <div className="container">
-        {products.map(i => <div>{i.name}</div>)}
+        <div className="row">
+        {products.map(i => <div className="col-md-6 col-lg-4 col-xl-3 p-3">{i.name}</div>)}
+        </div>
       </div>
     </>
   );

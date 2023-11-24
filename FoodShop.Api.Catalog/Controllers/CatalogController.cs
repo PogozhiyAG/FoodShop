@@ -65,7 +65,7 @@ namespace FoodShop.Api.Catalog.Controllers
             }
             if (!take.HasValue)
             {
-                take = 30;
+                take = 50;
             }
 
 
