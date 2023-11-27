@@ -1,4 +1,5 @@
-﻿using FoodShop.Core.Models;
+﻿using FoodShop.Api.Catalog.Services;
+using FoodShop.Core.Models;
 using FoodShop.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace FoodShop.Api.Catalog.Controllers
     public class CatalogController : ControllerBase
     {
         private readonly FoodShopDbContext _db;
+        private readonly IProductPriceStrategyProvider _priceStrategyProvider;
 
-        public CatalogController(FoodShopDbContext db)
+        public CatalogController(FoodShopDbContext db, IProductPriceStrategyProvider priceStrategyProvider)
         {
             _db = db;
+            _priceStrategyProvider = priceStrategyProvider;
         }
 
         [HttpGet]
@@ -72,27 +75,45 @@ namespace FoodShop.Api.Catalog.Controllers
             q = q.Skip(skip.Value);
             q = q.Take(take.Value);
 
-            return Ok(
-                q.Select(p => new {
-                    p.Id,
-                    p.Name,
-                    p.Description,
-                    Brand = new {
-                        p.Brand.Id,
-                        p.Brand.Name
-                    },
-                    Category = new
-                    {
-                        p.Category.Id,
-                        p.Category.Name
-                    },
+            var dummy = new[] { 0, 1 };
 
-                    p.Price,
-                    p.Popularity,
-                    p.CustomerRating,
-                    Tags = p.Tags.Select(p => p.Tag.Name).ToList(),
-                }).ToList()
-            );
+            q = q
+                .Include(p => p.Tags)
+                .Include(p => p.Brand)
+                .Include(p => p.Category);
+
+            return Ok(
+                q.Select(p => new
+                {
+                    Product = p,
+                    OfferLink = _priceStrategyProvider.GetStrategyLink(p, dummy)
+                })
+                .ToList()
+                .Select(p =>
+                    new
+                    {
+                        p.Product.Id,
+                        p.Product.Name,
+                        p.Product.Description,
+                        Brand = new
+                        {
+                            p.Product.Brand?.Id,
+                            p.Product.Brand?.Name
+                        },
+                        Category = new
+                        {
+                            p.Product.Category?.Id,
+                            p.Product.Category?.Name
+                        },
+                        p.Product.Price,
+                        p.Product.Popularity,
+                        p.Product.CustomerRating,
+                        //TODO
+                        OfferCode = p.OfferLink.TokenType?.Code,
+                        OfferPrice = p.OfferLink.ProductPriceStrategy.GetAmount(p.Product.Price, 1)
+                    }
+                )
+            ) ;
         }
     }
 }

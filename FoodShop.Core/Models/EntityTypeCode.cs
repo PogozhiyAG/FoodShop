@@ -10,6 +10,7 @@ namespace FoodShop.Core.Models
     {
         Product,
         ProductCategory,
+        Brand,
         Tag
     }
 }

@@ -68,7 +68,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
     {
         yield return product.Id;
 
-        foreach (var tag in product.Tags.Select(r => r.Tag).OrderByDescending(t => t.OfferPriority))
+        foreach (var tag in product.Tags.Select(r => r.Tag))
         {
             yield return tag.Id;
         }
@@ -80,9 +80,84 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
 
 
+
+
+
+
+
+
+
+    public ProductPriceStrategyLink GetTypedStrategy(Product product, IEnumerable<int> tokenTypeIds)
+    {
+        ProductPriceStrategyLink result = ProductPriceStrategyLink.Default;
+
+        var strategies = GetTypedStrategies();
+
+        foreach (var tokenTypeId in tokenTypeIds)
+        {
+            foreach (var referenceId in GetTypedReferencesFromProduct(product))
+            {
+                var key = new ValueTuple<int, EntityTypeCode, int>(tokenTypeId, referenceId.Item1, referenceId.Item2);
+                if (strategies.TryGetValue(key, out var value))
+                {
+                    if (value.Priority > result.Priority)
+                    {
+                        result = value;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    private Dictionary<(int, EntityTypeCode, int), ProductPriceStrategyLink> GetTypedStrategies()
+    {
+        if (_cache.TryGetValue(nameof(GetProductPriceStrategyLinks), out Dictionary<(int, EntityTypeCode, int), ProductPriceStrategyLink>? value))
+        {
+            return value!;
+        }
+
+        var result = _context.ProductPriceStrategyLinks.AsNoTracking()
+            .Include(s => s.ProductPriceStrategy)
+            .Include(s => s.TokenType)
+            .ToDictionary(s => new ValueTuple<int, EntityTypeCode, int>(s.TokenTypeId.HasValue ? s.TokenTypeId.Value : 0, s.ReferenceType, s.ReferenceId));
+
+        _cache.Set(nameof(GetStrategies), result, new MemoryCacheEntryOptions()
+        {
+            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
+        });
+
+        return result;
+    }
+
+
+
+    private IEnumerable<ValueTuple<EntityTypeCode, int>> GetTypedReferencesFromProduct(Product product)
+    {
+        yield return (EntityTypeCode.Product, product.Id);
+
+        foreach (var tag in product.Tags.Select(r => r.Tag))
+        {
+            yield return (EntityTypeCode.Tag, tag.Id);
+        }
+        if (product.CategoryId.HasValue)
+        {
+            yield return (EntityTypeCode.ProductCategory, product.CategoryId.Value);
+        }
+        if (product.BrandId.HasValue)
+        {
+            yield return (EntityTypeCode.Brand, product.BrandId.Value);
+        }
+    }
+
+
+
     public IEnumerable<ProductPriceStrategyLink> GetStrategyLinks(Product product, IEnumerable<int> tokenTypeIds)
     {
-        yield return GetStrategy(product, tokenTypeIds);
+        yield return GetTypedStrategy(product, tokenTypeIds);
+        //yield return GetStrategy(product, tokenTypeIds);
         //yield return GetStrategyLink(product, tokenTypeIds);
         //yield return ProductPriceStrategyLink.Default;
 
@@ -157,7 +232,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
         var q = links
             .Where(l => l.ReferenceId == product.Id && (l.TokenType == null || tokenTypeIds.Contains(l.TokenTypeId!.Value)))
-            .OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
+          //  .OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
             .FirstOrDefault();
         if (q != null)
         {
@@ -169,7 +244,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
         {
             q = links
             .Where(l => l.ReferenceId == tagRef.TagId && (l.TokenType == null || tokenTypeIds.Contains(l.TokenTypeId!.Value)))
-            .OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
+          //  .OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
             .FirstOrDefault();
             if (q != null)
             {
@@ -179,7 +254,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
         q = links
            .Where(l => product.CategoryId.HasValue && l.ReferenceId == product.CategoryId.Value && (l.TokenType == null || tokenTypeIds.Contains(l.TokenTypeId!.Value)))
-           .OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
+           //.OrderByDescending(l => l.TokenType != null ? l.TokenType!.OfferPriority : 0)
            .FirstOrDefault();
         if (q != null)
         {

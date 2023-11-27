@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import AuthContext from "../context/AuthContext";
+import FoodShopContext from "../context/FoodShopContext";
 
-const useAuth = () => useContext(AuthContext);
+const useAuth = () => useContext(FoodShopContext);
 
 export default useAuth;

@@ -36,14 +36,11 @@ public class FoodShopDbContext : DbContext
         modelBuilder.Entity<Basket>().HasIndex(b => b.OwnerId);
 
         modelBuilder.Entity<Tag>().HasIndex(t => t.Name).IsUnique();
-        modelBuilder.Entity<Tag>().HasIndex(t => t.OfferPriority).IsUnique();
 
         modelBuilder.Entity<ProductTagRelation>().HasKey("ProductId", "TagId");
 
-        modelBuilder.Entity<TokenType>().HasIndex(t => t.OfferPriority).IsUnique();
-
         modelBuilder.Entity<UserToken>().HasIndex(t => t.UserId);
 
-        modelBuilder.Entity<ProductPriceStrategyLink>().HasIndex("TokenTypeId", "ReferenceId");
+        modelBuilder.Entity<ProductPriceStrategyLink>().HasIndex("TokenTypeId", "ReferenceType", "ReferenceId");
     }
 }

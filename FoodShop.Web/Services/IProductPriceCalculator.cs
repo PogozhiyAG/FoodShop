@@ -17,35 +17,35 @@ public class ProductPriceCalculatorResult
 }
 
 
-public class ProductPriceCalculator : IProductPriceCalculator
-{
-    private readonly IUserTokenProvider _userTokenProvider;
-    private readonly IProductPriceStrategyProvider _productPriceStrategyProvider;
+//public class ProductPriceCalculator : IProductPriceCalculator
+//{
+//    private readonly IUserTokenProvider _userTokenProvider;
+//    private readonly IProductPriceStrategyProvider _productPriceStrategyProvider;
 
-    public ProductPriceCalculator(IUserTokenProvider userTokenProvider, IProductPriceStrategyProvider productPriceStrategyProvider)
-    {
-        _userTokenProvider = userTokenProvider;
-        _productPriceStrategyProvider = productPriceStrategyProvider;
-    }
+//    public ProductPriceCalculator(IUserTokenProvider userTokenProvider, IProductPriceStrategyProvider productPriceStrategyProvider)
+//    {
+//        _userTokenProvider = userTokenProvider;
+//        _productPriceStrategyProvider = productPriceStrategyProvider;
+//    }
 
-    public ProductPriceCalculatorResult Calculate(Product product, int quantity = 1)
-    {
-        var result = new ProductPriceCalculatorResult();
+//    public ProductPriceCalculatorResult Calculate(Product product, int quantity = 1)
+//    {
+//        var result = new ProductPriceCalculatorResult();
 
-        var tokenTypeIds = _userTokenProvider.GetUserTokens()
-            .Select(x => x.TokenTypeId)
-            .Concat(new[] { 0 });
+//        var tokenTypeIds = _userTokenProvider.GetUserTokens()
+//            .Select(x => x.TokenTypeId)
+//            .Concat(new[] { 0 });
 
-        foreach (var strategyLink in _productPriceStrategyProvider.GetStrategyLinks(product, tokenTypeIds))
-        {
-            var amount = strategyLink.ProductPriceStrategy.GetAmount(product.Price, quantity);
-            var key = (strategyLink.Priority, amount);
-            if (!result.CalculationResults.ContainsKey(key))
-            {
-                result.CalculationResults.Add(key, strategyLink);
-            }
-        }
+//        foreach (var strategyLink in _productPriceStrategyProvider.GetStrategyLinks(product, tokenTypeIds))
+//        {
+//            var amount = strategyLink.ProductPriceStrategy.GetAmount(product.Price, quantity);
+//            var key = (strategyLink.Priority, amount);
+//            if (!result.CalculationResults.ContainsKey(key))
+//            {
+//                result.CalculationResults.Add(key, strategyLink);
+//            }
+//        }
 
-        return result;
-    }
-}
+//        return result;
+//    }
+//}

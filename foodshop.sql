@@ -18,10 +18,12 @@ sp_help 'dbo.Products'
 
 
 
+  select * from ProductCategories 
   select * from [dbo].[ProductPriceStrategyLinks]
+  select * from [dbo].[ProductPriceStrategies]
+  select * from TokenTypes
 
-  select * from ProductCategories
-
+  select * from Products where id = 8592
 
 
   SELECT *  
@@ -94,4 +96,10 @@ sp_help 'dbo.Products'
   from
     Products
 where
-  freetext(Name, '"rose"')
+  freetext(Name, 'Grapes')
+
+
+  select *   from    Products where  Name ='GREEN GRAPES'
+
+
+  select * from ProductCategories where name = 'Candy'

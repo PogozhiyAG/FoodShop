@@ -30,6 +30,7 @@ public class UserTokenProvider : IUserTokenProvider
         return _context.UserTokens
             .AsNoTracking()
             .Where(ut => ut.UserId == _contextAccessor.HttpContext!.User.Identity!.Name)
+            //.OrderByDescending(ut => ut.TokenType.OfferPriority)
             .ToList();
     }
 }
