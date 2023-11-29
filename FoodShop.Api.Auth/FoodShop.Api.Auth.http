@@ -1,0 +1,6 @@
+@FoodShop.Api.Auth_HostAddress = http://localhost:5005
+
+GET {{FoodShop.Api.Auth_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

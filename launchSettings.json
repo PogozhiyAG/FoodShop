@@ -5,7 +5,7 @@
       "commandVersion": "1.0",
         "serviceActions": {
             "foodshop.api.catalog": "StartDebugging",
-            "foodshop.web": "StartDebugging",
+            "foodshop.api.auth": "StartDebugging",
             "sqldata": "StartWithoutDebugging",
             "basketdata": "StartWithoutDebugging"
         }
