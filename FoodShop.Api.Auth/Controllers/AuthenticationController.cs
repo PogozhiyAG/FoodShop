@@ -42,7 +42,7 @@ public class AuthenticationController : ControllerBase
 
         if (result.Succeeded)
         {
-            Ok("User successfully created");
+            return Ok("User successfully created");
         }
 
         return StatusCode(StatusCodes.Status500InternalServerError, result);
@@ -71,6 +71,36 @@ public class AuthenticationController : ControllerBase
             Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
             RefreshToken = refreshToken
         };
+
+        return Ok(result);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody]RefreshModel model)
+    {
+        var principal = GetPrincipalFromToken(model.Token);
+        var userName = principal.Identity?.Name;
+
+        if(userName == null)
+        {
+            return Unauthorized();
+        }
+
+        var user = await _userManager.FindByNameAsync(userName);
+
+        if(user == null || user.RefreshToken != model.RefreshToken || user.RefreshTokenExpired < DateTime.Now)
+        {
+            return Unauthorized();
+        }
+
+        var jwtToken = GenerateJwtToken(user);
+
+        var result = new LoginResponse()
+        {
+            Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
+            RefreshToken = model.RefreshToken
+        };
+
         return Ok(result);
     }
 
@@ -98,5 +128,20 @@ public class AuthenticationController : ControllerBase
         var generator = RandomNumberGenerator.Create();
         generator.GetBytes(array);
         return Convert.ToBase64String(array);
+    }
+
+    private ClaimsPrincipal GetPrincipalFromToken(string token)
+    {
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(";oikehjnoiwnrg'ponwwjhuIOHUIOUIYU&%^&$^FUJhkj;lksrmgt;lerjtle;rjtlerjtle;r;mev;lem;lrjhel;rj;o;pj'p-f3-"));
+
+        var validationParameters = new TokenValidationParameters()
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            IssuerSigningKey = key,
+            ValidateLifetime = false
+        };
+
+        return new JwtSecurityTokenHandler().ValidateToken(token, validationParameters, out _);
     }
 }
