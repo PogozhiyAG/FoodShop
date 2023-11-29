@@ -94,11 +94,16 @@ public class AuthenticationController : ControllerBase
         }
 
         var jwtToken = GenerateJwtToken(user);
+        var refreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+
+        await _userManager.UpdateAsync(user);
 
         var result = new LoginResponse()
         {
             Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
-            RefreshToken = model.RefreshToken
+            RefreshToken = refreshToken
         };
 
         return Ok(result);
