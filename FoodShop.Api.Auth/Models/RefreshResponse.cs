@@ -1,7 +1,6 @@
-﻿
-namespace FoodShop.Api.Auth.Models;
+﻿namespace FoodShop.Api.Auth.Models;
 
-public class RefreshModel
+public class RefreshResponse
 {
     public required string Token { get; set; }
     public required string RefreshToken { get; set; }

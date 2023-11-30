@@ -26,9 +26,9 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody]RegistrationModel model)
+    public async Task<IActionResult> Register([FromBody]RegistrationRequest registrationRequest)
     {
-        var existingUser = await _userManager.FindByNameAsync(model.UserName);
+        var existingUser = await _userManager.FindByNameAsync(registrationRequest.UserName);
         if (existingUser != null)
         {
             return Conflict("User already exists");
@@ -36,10 +36,10 @@ public class AuthenticationController : ControllerBase
 
         var user = new ApplicationUser()
         {
-            UserName = model.UserName
+            UserName = registrationRequest.UserName
         };
 
-        var result = await _userManager.CreateAsync(user, model.Password);
+        var result = await _userManager.CreateAsync(user, registrationRequest.Password);
 
         if (result.Succeeded)
         {
@@ -51,10 +51,10 @@ public class AuthenticationController : ControllerBase
 
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel model)
+    public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
-        var user = await _userManager.FindByNameAsync(model.UserName);
-        if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+        var user = await _userManager.FindByNameAsync(loginRequest.UserName);
+        if (user == null || !await _userManager.CheckPasswordAsync(user, loginRequest.Password))
         {
             return Unauthorized();
         }
@@ -78,9 +78,9 @@ public class AuthenticationController : ControllerBase
 
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody]RefreshModel model)
+    public async Task<IActionResult> Refresh([FromBody]RefreshRequest refreshRequest)
     {
-        var principal = GetPrincipalFromToken(model.Token);
+        var principal = GetPrincipalFromToken(refreshRequest.Token);
         var userName = principal.Identity?.Name;
 
         if(userName == null)
@@ -90,7 +90,7 @@ public class AuthenticationController : ControllerBase
 
         var user = await _userManager.FindByNameAsync(userName);
 
-        if(user == null || user.RefreshToken != model.RefreshToken || user.RefreshTokenExpired < DateTime.UtcNow)
+        if(user == null || user.RefreshToken != refreshRequest.RefreshToken || user.RefreshTokenExpired < DateTime.UtcNow)
         {
             return Unauthorized();
         }
@@ -102,7 +102,7 @@ public class AuthenticationController : ControllerBase
 
         await _userManager.UpdateAsync(user);
 
-        var result = new LoginResponse()
+        var result = new RefreshResponse()
         {
             Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
             RefreshToken = refreshToken
