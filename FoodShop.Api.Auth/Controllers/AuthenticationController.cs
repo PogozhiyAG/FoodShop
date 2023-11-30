@@ -1,12 +1,12 @@
 ﻿using FoodShop.Api.Auth.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks.Sources;
 
 namespace FoodShop.Api.Auth.Controllers;
 
@@ -15,14 +15,15 @@ namespace FoodShop.Api.Auth.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IOptions<JwtBearerOptions> _jwtBearerOptions;
     private readonly IConfiguration _configuration;
 
-    public AuthenticationController(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+    public AuthenticationController(UserManager<ApplicationUser> userManager, IOptions<JwtBearerOptions> jwtBearerOptions, IConfiguration configuration)
     {
         _userManager = userManager;
+        _jwtBearerOptions = jwtBearerOptions;
         _configuration = configuration;
     }
-
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody]RegistrationModel model)
@@ -62,7 +63,7 @@ public class AuthenticationController : ControllerBase
         var refreshToken = GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpired = DateTime.Now.AddDays(7);
+        user.RefreshTokenExpired = DateTime.UtcNow.Add(TimeSpan.Parse(_configuration["JWT:RefreshTokenLifetime"]));
 
         await _userManager.UpdateAsync(user);
 
@@ -74,6 +75,7 @@ public class AuthenticationController : ControllerBase
 
         return Ok(result);
     }
+
 
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody]RefreshModel model)
@@ -88,7 +90,7 @@ public class AuthenticationController : ControllerBase
 
         var user = await _userManager.FindByNameAsync(userName);
 
-        if(user == null || user.RefreshToken != model.RefreshToken || user.RefreshTokenExpired < DateTime.Now)
+        if(user == null || user.RefreshToken != model.RefreshToken || user.RefreshTokenExpired < DateTime.UtcNow)
         {
             return Unauthorized();
         }
@@ -109,23 +111,26 @@ public class AuthenticationController : ControllerBase
         return Ok(result);
     }
 
+
     private JwtSecurityToken GenerateJwtToken(ApplicationUser user)
     {
         var claims = new List<Claim>()
         {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Name, user.UserName)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(";oikehjnoiwnrg'ponwwjhuIOHUIOUIYU&%^&$^FUJhkj;lksrmgt;lerjtle;rjtlerjtle;r;mev;lem;lrjhel;rj;o;pj'p-f3-"));
-
         var result = new JwtSecurityToken(
+            issuer:  _jwtBearerOptions.Value.TokenValidationParameters.ValidIssuer,
+            audience: _jwtBearerOptions.Value.TokenValidationParameters.ValidAudience,
             claims: claims,
-            expires: DateTime.UtcNow.AddSeconds(60),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+            expires: DateTime.UtcNow.Add(TimeSpan.Parse(_configuration["JWT:TokenLifetime"])),
+            signingCredentials: new SigningCredentials(_jwtBearerOptions.Value.TokenValidationParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256)
         );
 
         return result;
     }
+
 
     private string GenerateRefreshToken()
     {
@@ -135,17 +140,11 @@ public class AuthenticationController : ControllerBase
         return Convert.ToBase64String(array);
     }
 
+
     private ClaimsPrincipal GetPrincipalFromToken(string token)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(";oikehjnoiwnrg'ponwwjhuIOHUIOUIYU&%^&$^FUJhkj;lksrmgt;lerjtle;rjtlerjtle;r;mev;lem;lrjhel;rj;o;pj'p-f3-"));
-
-        var validationParameters = new TokenValidationParameters()
-        {
-            ValidateAudience = false,
-            ValidateIssuer = false,
-            IssuerSigningKey = key,
-            ValidateLifetime = false
-        };
+        var validationParameters = _jwtBearerOptions.Value.TokenValidationParameters.Clone();
+        validationParameters.ValidateLifetime = false;
 
         return new JwtSecurityTokenHandler().ValidateToken(token, validationParameters, out _);
     }

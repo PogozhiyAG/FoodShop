@@ -1,4 +1,4 @@
-﻿namespace FoodShop.Api.Auth.Controllers;
+﻿namespace FoodShop.Api.Auth.Models;
 
 public class LoginResponse
 {
