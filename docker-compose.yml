@@ -1,6 +1,17 @@
 version: '3.4'
 
 services:
+  foodshop.api.customerprofile:
+    image: ${DOCKER_REGISTRY-}foodshopapicustomerprofile
+    build:
+      context: .
+      dockerfile: FoodShop.Api.CustomerProfile/Dockerfile
+    ports:
+      - "12080:80"
+      - "12443:443"
+    networks:
+      - foodshopnetwork
+
   foodshop.api.auth:
     image: ${DOCKER_REGISTRY-}foodshopapiauth
     build:
