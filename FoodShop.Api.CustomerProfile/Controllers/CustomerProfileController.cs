@@ -22,9 +22,9 @@ public class CustomerProfileController : ControllerBase
     [HttpGet("tokens")]
     public async Task<IActionResult> GetTokens()
     {
-        var userId = GetUserId();
+        var userName = GetUserName();
         var result = await _db.CustomerTokens.AsNoTracking()
-            .Where(x => x.UserId == userId)
+            .Where(x => x.UserName == userName)
             .ToListAsync();
         return Ok(result);
     }
@@ -32,11 +32,11 @@ public class CustomerProfileController : ControllerBase
     [HttpGet("valid-token-types")]
     public async Task<IActionResult> GetValidTokenTypes()
     {
-        var userId = GetUserId();
+        var userName = GetUserName();
         var moment = DateTime.Now;
 
         var result = await _db.CustomerTokens.AsNoTracking()
-            .Where(t => t.UserId == userId)
+            .Where(x => x.UserName == userName)
             .Where(t => t.ValidFrom <= moment && (t.ValidTo == null || t.ValidTo > moment))
             .Select(t => t.TokenType.Code)
             .Distinct()
@@ -44,8 +44,5 @@ public class CustomerProfileController : ControllerBase
         return Ok(result);
     }
 
-    private string GetUserId()
-    {
-        return Request.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-    }
+    private string GetUserName() => Request.HttpContext.User.Identity.Name;
 }

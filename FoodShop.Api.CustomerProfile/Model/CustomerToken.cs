@@ -3,7 +3,7 @@
 public class CustomerToken
 {
     public Guid Id { get; set; }
-    public required string UserId { get; set; }
+    public required string UserName { get; set; }
     public required string TokenTypeCode { get; set; }
     public CustomerTokenType? TokenType { get; set; }
     public DateTime? ValidFrom { get; set; }
