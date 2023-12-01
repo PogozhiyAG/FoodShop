@@ -75,7 +75,7 @@ namespace FoodShop.Api.Catalog.Controllers
             q = q.Skip(skip.Value);
             q = q.Take(take.Value);
 
-            var dummy = new[] { 0, 1 };
+            var dummy = new[] { "", "XMAS" };
 
             q = q
                 .Include(p => p.Tags)
@@ -109,7 +109,7 @@ namespace FoodShop.Api.Catalog.Controllers
                         p.Product.Popularity,
                         p.Product.CustomerRating,
                         //TODO
-                        OfferCode = p.OfferLink.TokenType?.Code,
+                        OfferCode = p.OfferLink.TokenTypeCode,
                         OfferPrice = p.OfferLink.ProductPriceStrategy.GetAmount(p.Product.Price, 1)
                     }
                 )

@@ -16,8 +16,6 @@ public class FoodShopDbContext : DbContext
     public DbSet<Tag> Tags { get; set; }
     public DbSet<ProductTagRelation> ProductTagRelations { get; set; }
     public DbSet<ProductPriceStrategy> ProductPriceStrategies { get; set; }
-    public DbSet<TokenType> TokenTypes { get; set; }
-    public DbSet<UserToken> UserTokens { get; set; }
     public DbSet<ProductPriceStrategyLink> ProductPriceStrategyLinks { get; set; }
     public DbSet<Brand> Brands { get; set; }
 
@@ -39,8 +37,6 @@ public class FoodShopDbContext : DbContext
 
         modelBuilder.Entity<ProductTagRelation>().HasKey("ProductId", "TagId");
 
-        modelBuilder.Entity<UserToken>().HasIndex(t => t.UserId);
-
-        modelBuilder.Entity<ProductPriceStrategyLink>().HasIndex("TokenTypeId", "ReferenceType", "ReferenceId");
+        modelBuilder.Entity<ProductPriceStrategyLink>().HasIndex("TokenTypeCode", "ReferenceType", "ReferenceId");
     }
 }

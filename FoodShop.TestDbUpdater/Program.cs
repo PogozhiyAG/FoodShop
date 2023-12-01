@@ -113,13 +113,8 @@ db.ProductTagRelations.Add(new() { Tag = tagChristmas, Product = db.Products.Fir
 db.ProductTagRelations.Add(new() { Tag = tagChristmas, Product = db.Products.First(p => p.Name == "CONCORD GRAPE JELLY") });
 db.SaveChanges();
 
-var tokenTypeClub = new TokenType() { Code = "Club", Decription = "Food Club Member"};
-db.Add(tokenTypeClub);
-db.SaveChanges();
+var tokenTypeClub = "Club";
 
-var userToken = new UserToken() { TokenType = tokenTypeClub, UserId = "pogozhiyag@gmail.com", ValidFrom = DateTime.Now.Date, ValidTo = DateTime.Now.AddYears(1).Date };
-db.Add(userToken);
-db.SaveChanges();
 
 var ps_0_95 = new ProductPriceStrategy() { Quantity = 1, Rate = 0.95M, Name= "5% off" };
 var ps_2_90 = new ProductPriceStrategy() { Quantity = 2, Rate = 0.90M, Name= "10% off for 2" };
@@ -132,8 +127,8 @@ db.SaveChanges();
 
 db.Add(new ProductPriceStrategyLink() { Priority = 100, ReferenceType = EntityTypeCode.Product, ReferenceId = db.Products.First(p => p.Name == "MINI AVOCADOS").Id, ProductPriceStrategy = ps_0_95 });
 db.Add(new ProductPriceStrategyLink() { Priority = 101, ReferenceType = EntityTypeCode.Product, ReferenceId = db.Products.First(p => p.Name == "GREEN GRAPES").Id, ProductPriceStrategy = ps_2_90 });
-db.Add(new ProductPriceStrategyLink() { Priority = 150.1M, TokenTypeId = tokenTypeClub.Id, ReferenceType = EntityTypeCode.ProductCategory, ReferenceId = db.ProductCategories.First(c => c.Name == "Candy").Id, ProductPriceStrategy = ps_0_97 });
-db.Add(new ProductPriceStrategyLink() { Priority = 150.2M, TokenTypeId = tokenTypeClub.Id, ReferenceType = EntityTypeCode.Tag, ReferenceId = tagHealth.Id, ProductPriceStrategy = ps_2_85 });
+db.Add(new ProductPriceStrategyLink() { Priority = 150.1M, TokenTypeCode = tokenTypeClub, ReferenceType = EntityTypeCode.ProductCategory, ReferenceId = db.ProductCategories.First(c => c.Name == "Candy").Id, ProductPriceStrategy = ps_0_97 });
+db.Add(new ProductPriceStrategyLink() { Priority = 150.2M, TokenTypeCode = tokenTypeClub, ReferenceType = EntityTypeCode.Tag, ReferenceId = tagHealth.Id, ProductPriceStrategy = ps_2_85 });
 db.Add(new ProductPriceStrategyLink() { Priority = 120, ReferenceType = EntityTypeCode.Tag, ReferenceId = tagChristmas.Id, ProductPriceStrategy = ps_0_94 });
 db.SaveChanges();
 
