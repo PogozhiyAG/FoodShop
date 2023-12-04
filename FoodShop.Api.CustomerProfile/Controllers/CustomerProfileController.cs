@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace FoodShop.Api.CustomerProfile.Controllers;
 
@@ -18,21 +17,9 @@ public class CustomerProfileController : ControllerBase
         _db = db;
     }
 
-
-    [HttpGet("tokens")]
-    public async Task<IActionResult> GetTokens()
+    [HttpGet("valid-token-types/{userName}")]
+    public async Task<IActionResult> GetValidTokenTypes(string userName)
     {
-        var userName = GetUserName();
-        var result = await _db.CustomerTokens.AsNoTracking()
-            .Where(x => x.UserName == userName)
-            .ToListAsync();
-        return Ok(result);
-    }
-
-    [HttpGet("valid-token-types")]
-    public async Task<IActionResult> GetValidTokenTypes()
-    {
-        var userName = GetUserName();
         var moment = DateTime.Now;
 
         var result = await _db.CustomerTokens.AsNoTracking()
@@ -41,8 +28,7 @@ public class CustomerProfileController : ControllerBase
             .Select(t => t.TokenType.Code)
             .Distinct()
             .ToListAsync();
+
         return Ok(result);
     }
-
-    private string GetUserName() => Request.HttpContext.User.Identity.Name;
 }

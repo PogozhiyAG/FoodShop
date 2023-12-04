@@ -13,15 +13,24 @@ namespace FoodShop.Api.Catalog.Controllers
     {
         private readonly FoodShopDbContext _db;
         private readonly IProductPriceStrategyProvider _priceStrategyProvider;
+        private readonly ICustomerProfile _customerProfile;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CatalogController(FoodShopDbContext db, IProductPriceStrategyProvider priceStrategyProvider)
+        public CatalogController(
+            FoodShopDbContext db,
+            IProductPriceStrategyProvider priceStrategyProvider,
+            ICustomerProfile customerProfile,
+            IHttpContextAccessor httpContextAccessor)
         {
             _db = db;
             _priceStrategyProvider = priceStrategyProvider;
+            _customerProfile = customerProfile;
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
         [HttpGet]
-        public IActionResult GetProducts(
+        public async Task<IActionResult> GetProducts(
             int? categoryId,
             int? brandId,
             int? tagId,
@@ -75,7 +84,7 @@ namespace FoodShop.Api.Catalog.Controllers
             q = q.Skip(skip.Value);
             q = q.Take(take.Value);
 
-            var dummy = new[] { "", "XMAS" };
+            var tokenTypes = await _customerProfile.GetTokenTypes(_httpContextAccessor.HttpContext.User.Identity.Name);
 
             q = q
                 .Include(p => p.Tags)
@@ -86,7 +95,7 @@ namespace FoodShop.Api.Catalog.Controllers
                 q.Select(p => new
                 {
                     Product = p,
-                    OfferLink = _priceStrategyProvider.GetStrategyLink(p, dummy)
+                    OfferLink = _priceStrategyProvider.GetStrategyLink(p, tokenTypes)
                 })
                 .ToList()
                 .Select(p =>
