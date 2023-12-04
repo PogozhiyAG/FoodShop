@@ -1,28 +1,28 @@
 ﻿using FoodShop.Api.Catalog.Services;
-using FoodShop.Core.Models;
 using FoodShop.Infrastructure.Data;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodShop.Api.Catalog.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class CatalogController : ControllerBase
     {
-        private readonly FoodShopDbContext _db;
+        private readonly IDbContextFactory<FoodShopDbContext> _dbContextFactory;
         private readonly IProductPriceStrategyProvider _priceStrategyProvider;
         private readonly ICustomerProfile _customerProfile;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public CatalogController(
-            FoodShopDbContext db,
+            IDbContextFactory<FoodShopDbContext> dbContextFactory,
             IProductPriceStrategyProvider priceStrategyProvider,
             ICustomerProfile customerProfile,
             IHttpContextAccessor httpContextAccessor)
         {
-            _db = db;
+            _dbContextFactory = dbContextFactory;
             _priceStrategyProvider = priceStrategyProvider;
             _customerProfile = customerProfile;
             _httpContextAccessor = httpContextAccessor;
@@ -40,7 +40,9 @@ namespace FoodShop.Api.Catalog.Controllers
             ProductSortType? sort
         )
         {
-            var q = _db.Products.AsNoTracking();
+            using var db = await _dbContextFactory.CreateDbContextAsync();
+
+            var q = db.Products.AsNoTracking();
 
             if (!String.IsNullOrEmpty(text))
             {

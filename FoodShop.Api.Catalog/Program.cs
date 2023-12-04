@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 builder.Services.AddEndpointsApiExplorer();
@@ -23,12 +25,10 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer();
 
-builder.Services.AddDbContext<FoodShopDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContextFactory<FoodShopDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<IProductPriceStrategyProvider, ProductPriceStrategyProvider>();
 builder.Services.AddScoped<ICustomerProfile, CustomerProfile>();
-
-builder.Services.AddHttpClient();
-builder.Services.AddHttpContextAccessor();
 
 
 var app = builder.Build();

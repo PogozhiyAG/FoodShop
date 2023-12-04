@@ -12,15 +12,13 @@ public interface IProductPriceStrategyProvider
 
 public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 {
-    private readonly FoodShopDbContext _context;
+    private readonly IDbContextFactory<FoodShopDbContext> _dbContextFactory;
     private readonly IMemoryCache _cache;
 
-    public ProductPriceStrategyProvider(FoodShopDbContext context, IMemoryCache cache)
+    public ProductPriceStrategyProvider(IDbContextFactory<FoodShopDbContext> dbContextFactory, IMemoryCache cache)
     {
-        _context = context;
+        _dbContextFactory = dbContextFactory;
         _cache = cache;
-        //TODO:
-        var strategies = GetTypedStrategies();
     }
 
     public ProductPriceStrategyLink GetStrategyLink(Product product, IEnumerable<string> tokenTypeIds)
@@ -60,7 +58,9 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
             return value!;
         }
 
-        var result = _context.ProductPriceStrategyLinks.AsNoTracking()
+        using var db = _dbContextFactory.CreateDbContext();
+
+        var result = db.ProductPriceStrategyLinks.AsNoTracking()
             .Include(s => s.ProductPriceStrategy)
             .ToDictionary(s => new ValueTuple<string, EntityTypeCode, int>(s.TokenTypeCode ?? "", s.ReferenceType, s.ReferenceId));
 
