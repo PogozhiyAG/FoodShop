@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace FoodShop.Api.CustomerProfile.Configuration;
@@ -27,9 +28,17 @@ public class ConfigureJWTBearerOptions : IConfigureNamedOptions<JwtBearerOptions
             ValidIssuer = _configuration["JWT:ValidIssuer"],
             ValidateAudience = true,
             ValidAudience = _configuration["JWT:ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+            IssuerSigningKey = GetKey(),
             ValidateIssuerSigningKey = true,
             ClockSkew = TimeSpan.Zero
         };
+    }
+
+    private RsaSecurityKey GetKey()
+    {
+        var raw = _configuration["JWT:PublicKey"];
+        var rsa = RSA.Create();
+        rsa.FromXmlString(raw);
+        return new RsaSecurityKey(rsa);
     }
 }

@@ -140,8 +140,8 @@ public class AuthenticationController : ControllerBase
             audience: _jwtBearerOptions.Value.TokenValidationParameters.ValidAudience,
             claims: claims,
             expires: DateTime.UtcNow.AddYears(100),
-            signingCredentials: new SigningCredentials(_jwtBearerOptions.Value.TokenValidationParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256)
-        ) ;
+            signingCredentials: new SigningCredentials(_jwtBearerOptions.Value.TokenValidationParameters.IssuerSigningKey, SecurityAlgorithms.RsaSha256Signature, SecurityAlgorithms.Sha256Digest)
+        );
 
         return result;
     }
@@ -160,7 +160,7 @@ public class AuthenticationController : ControllerBase
             audience: _jwtBearerOptions.Value.TokenValidationParameters.ValidAudience,
             claims: claims,
             expires: DateTime.UtcNow.Add(TimeSpan.Parse(_configuration["JWT:TokenLifetime"])),
-            signingCredentials: new SigningCredentials(_jwtBearerOptions.Value.TokenValidationParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256)
+            signingCredentials: new SigningCredentials(_jwtBearerOptions.Value.TokenValidationParameters.IssuerSigningKey, SecurityAlgorithms.RsaSha256Signature, SecurityAlgorithms.Sha256Digest)
         );
 
         return result;
