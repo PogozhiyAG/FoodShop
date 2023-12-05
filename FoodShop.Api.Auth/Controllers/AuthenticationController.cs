@@ -67,7 +67,7 @@ public class AuthenticationController : ControllerBase
 
         await _userManager.UpdateAsync(user);
 
-        var result = new LoginResponse()
+        var result = new TokenResponse()
         {
             Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
             RefreshToken = refreshToken
@@ -102,7 +102,7 @@ public class AuthenticationController : ControllerBase
 
         await _userManager.UpdateAsync(user);
 
-        var result = new RefreshResponse()
+        var result = new TokenResponse()
         {
             Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
             RefreshToken = refreshToken
@@ -112,12 +112,47 @@ public class AuthenticationController : ControllerBase
     }
 
 
+    [HttpGet("anonymous")]
+    public IActionResult Anonymous()
+    {
+        var result = new TokenResponse()
+        {
+            IsAnonymous = true,
+            Token = new JwtSecurityTokenHandler().WriteToken(GenerateAnonymousJwtToken())
+        };
+
+        return Ok(result);
+    }
+
+
+    private JwtSecurityToken GenerateAnonymousJwtToken()
+    {
+        var anonymousUserName = Guid.NewGuid().ToString();
+
+        var claims = new List<Claim>()
+        {
+            new (ClaimTypes.Name, anonymousUserName),
+            new (ClaimTypes.Anonymous, anonymousUserName)
+        };
+
+        var result = new JwtSecurityToken(
+            issuer: _jwtBearerOptions.Value.TokenValidationParameters.ValidIssuer,
+            audience: _jwtBearerOptions.Value.TokenValidationParameters.ValidAudience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddYears(100),
+            signingCredentials: new SigningCredentials(_jwtBearerOptions.Value.TokenValidationParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256)
+        ) ;
+
+        return result;
+    }
+
+
     private JwtSecurityToken GenerateJwtToken(ApplicationUser user)
     {
         var claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Name, user.UserName)
+            new (ClaimTypes.NameIdentifier, user.Id),
+            new (ClaimTypes.Name, user.UserName)
         };
 
         var result = new JwtSecurityToken(

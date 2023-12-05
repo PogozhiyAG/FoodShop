@@ -1,11 +1,13 @@
 ﻿using FoodShop.Api.Catalog.Services;
 using FoodShop.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace FoodShop.Api.Catalog.Controllers;
 
-
+[Authorize]
 [Route("[controller]")]
 [ApiController]
 public class CatalogController : ControllerBase
@@ -39,11 +41,13 @@ public class CatalogController : ControllerBase
         ProductSortType? sort
     )
     {
+        var tokenTypes = await GetTokenTypes();
+
         using var db = await _dbContextFactory.CreateDbContextAsync();
 
         var q = db.Products.AsNoTracking();
 
-        if (!String.IsNullOrEmpty(text))
+        if (!string.IsNullOrEmpty(text))
         {
             q = q.Where(p => EF.Functions.Contains(p.Name, text));
         }
@@ -81,14 +85,10 @@ public class CatalogController : ControllerBase
             take = 50;
         }
 
-
-        q = q.Skip(skip.Value);
-        q = q.Take(take.Value);
-
-        var tokenTypes = await _customerProfile.GetTokenTypes(_httpContextAccessor.HttpContext.User.Identity.Name);
-
         q = q
-            .Include(p => p.Tags)
+            .Skip(skip.Value)
+            .Take(take.Value)
+            .Include(p => p.Tags).ThenInclude(t => t.Tag)
             .Include(p => p.Brand)
             .Include(p => p.Category);
 
@@ -119,10 +119,23 @@ public class CatalogController : ControllerBase
                     p.Product.Popularity,
                     p.Product.CustomerRating,
                     //TODO
-                    OfferCode = p.OfferLink.TokenTypeCode,
+                    p.OfferLink,
                     OfferPrice = p.OfferLink.ProductPriceStrategy.GetAmount(p.Product.Price, 1)
                 }
             )
-        ) ;
+        );
+    }
+
+
+    private async Task<IEnumerable<string>> GetTokenTypes()
+    {
+        var principal = _httpContextAccessor.HttpContext.User;
+        var isAnonymous = principal.Claims.Any(c => c.Type == ClaimTypes.Anonymous);
+        if (isAnonymous)
+        {
+            return Array.Empty<string>();
+        }
+
+        return await _customerProfile.GetTokenTypes(principal.Identity.Name);
     }
 }
