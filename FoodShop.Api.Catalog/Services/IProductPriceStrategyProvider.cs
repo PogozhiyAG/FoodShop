@@ -23,21 +23,16 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
     public ProductPriceStrategyLink GetStrategyLink(Product product, IEnumerable<string> tokenTypeIds)
     {
-        return GetTypedStrategy(product, tokenTypeIds);
-    }
-
-
-    public ProductPriceStrategyLink GetTypedStrategy(Product product, IEnumerable<string> tokenTypeIds)
-    {
         ProductPriceStrategyLink result = ProductPriceStrategyLink.Default;
 
-        var strategies = GetTypedStrategies();
+        var strategies = GetStrategies();
 
-        foreach (var tokenTypeId in tokenTypeIds)
+        var fullTokenTypeIds = tokenTypeIds.Append(null);
+        foreach (var tokenTypeId in fullTokenTypeIds)
         {
-            foreach (var referenceId in GetTypedReferencesFromProduct(product))
+            foreach (var referenceId in GetReferencesFromProduct(product))
             {
-                var key = new ValueTuple<string, EntityTypeCode, int>(tokenTypeId, referenceId.Item1, referenceId.Item2);
+                var key = new ValueTuple<string?, EntityTypeCode, int>(tokenTypeId, referenceId.Item1, referenceId.Item2);
                 if (strategies.TryGetValue(key, out var value))
                 {
                     if (value.Priority > result.Priority)
@@ -51,9 +46,9 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
         return result;
     }
 
-    private Dictionary<(string, EntityTypeCode, int), ProductPriceStrategyLink> GetTypedStrategies()
+    private Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink> GetStrategies()
     {
-        if (_cache.TryGetValue(nameof(GetTypedStrategies), out Dictionary<(string, EntityTypeCode, int), ProductPriceStrategyLink>? value))
+        if (_cache.TryGetValue(nameof(GetStrategies), out Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink>? value))
         {
             return value!;
         }
@@ -62,9 +57,9 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
         var result = db.ProductPriceStrategyLinks.AsNoTracking()
             .Include(s => s.ProductPriceStrategy)
-            .ToDictionary(s => new ValueTuple<string, EntityTypeCode, int>(s.TokenTypeCode ?? "", s.ReferenceType, s.ReferenceId));
+            .ToDictionary(s => new ValueTuple<string?, EntityTypeCode, int>(s.TokenTypeCode, s.ReferenceType, s.ReferenceId));
 
-        _cache.Set(nameof(GetTypedStrategies), result, new MemoryCacheEntryOptions()
+        _cache.Set(nameof(GetStrategies), result, new MemoryCacheEntryOptions()
         {
             AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
         });
@@ -72,7 +67,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
         return result;
     }
 
-    private IEnumerable<ValueTuple<EntityTypeCode, int>> GetTypedReferencesFromProduct(Product product)
+    private IEnumerable<ValueTuple<EntityTypeCode, int>> GetReferencesFromProduct(Product product)
     {
         yield return (EntityTypeCode.Product, product.Id);
 
