@@ -16,7 +16,11 @@ const Home = () => {
   }
 
   useEffect(() => {
-    fetch(getDataUrl())
+    fetch(getDataUrl(), {
+      headers: {
+        Authorization: 'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiSldUIn0.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiOGE0OTUwYWEtMzdiYi00ODU4LTg5ZjctNGJjYjEyNjA4NGRjIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvYW5vbnltb3VzIjoiOGE0OTUwYWEtMzdiYi00ODU4LTg5ZjctNGJjYjEyNjA4NGRjIiwiZXhwIjo0ODU3NDg5Mjg5LCJpc3MiOiJGb29kU2hvcC5BcGkuQXV0aCIsImF1ZCI6IkZvb2RTaG9wIn0.bTFqdLT1YTXpeBCsA_Tm3ly28ujtkm7N6yO8ghLMg0x32VBRQmshKaiCPNyp625HVCfyVuYrls9dUFPIzhKwT--EEf2w3vkor00Di7MQGCfLn52Z_zyMOLYE218U26Rk6XzYTxYsyp-ejUfWuaSpOIUGZuFB0h_X9b-1aCNstBs'
+      }
+    })
     .then(r => r.json())
     .then(r => setProducts(r))
   }, [searchText, sortOrder]);

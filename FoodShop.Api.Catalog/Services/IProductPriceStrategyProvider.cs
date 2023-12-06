@@ -71,9 +71,9 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
     {
         yield return (EntityTypeCode.Product, product.Id);
 
-        foreach (var tag in product.Tags.Select(r => r.Tag))
+        foreach (var tag in product.Tags)
         {
-            yield return (EntityTypeCode.Tag, tag.Id);
+            yield return (EntityTypeCode.Tag, tag.TagId);
         }
 
         if (product.CategoryId.HasValue)
