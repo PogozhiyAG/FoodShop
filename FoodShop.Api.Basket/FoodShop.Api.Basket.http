@@ -1,6 +1,0 @@
-@FoodShop.Api.Basket_HostAddress = http://localhost:5177
-
-GET {{FoodShop.Api.Basket_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

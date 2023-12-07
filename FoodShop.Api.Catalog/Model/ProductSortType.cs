@@ -1,4 +1,4 @@
-﻿namespace FoodShop.Api.Catalog;
+﻿namespace FoodShop.Api.Catalog.Model;
 
 public enum ProductSortType
 {
