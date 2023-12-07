@@ -59,6 +59,8 @@ services:
 
   basketdata:
     image: redis:alpine
+    ports:
+      - "6379:6379"
     networks:
       - foodshopnetwork
 
