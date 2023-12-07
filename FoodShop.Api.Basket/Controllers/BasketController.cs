@@ -32,6 +32,7 @@ public class BasketController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get()
     {
+        //TODO edge case when the basket is empty
         var basket = await EnsureBasket();
         var calculatedBasket = await GetCalculatedBasket(basket);
         return Ok(calculatedBasket);

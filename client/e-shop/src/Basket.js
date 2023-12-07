@@ -31,10 +31,10 @@ const Basket = () => {
                         <div className="col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2 product-item">
                             <img src="food.jpg" className="product-image"/>
                             <div className="product-item-description">{product.name}</div>
-                            <div>{product.popularity}</div>
-                            <div className="product-item-price">{product.price}</div>
+                            
+                            <div className="product-item-price">{product.basePrice}</div>
                             <div className="product-item-qty">{product.quantity}</div>
-                            <div className="product-item-offer-amount">{product.offerAmount}</div>                            
+                            <div className="product-item-offer-amount">{product.offerAmount} ({product.baseAmount})</div>                            
                         </div>
                     );
                 })}

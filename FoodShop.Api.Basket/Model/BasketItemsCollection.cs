@@ -2,24 +2,19 @@
 
 public class BasketItemsCollection : Dictionary<string, int>
 {
-    public void AddQuantity(string productId, int qty = 1)
+    public void SetQuantity(string productId, int qty)
     {
-        int value;
-        TryGetValue(productId, out value);
-
-        value += qty;
-
-        if (value > 0)
-        {
-            this[productId] = value;
-        }
-        else
-        {
-            Remove(productId);
-        }
+        SetPositionQuantity(productId, qty);
     }
 
-    public void SetQuantity(string productId, int qty)
+    public void AddQuantity(string productId, int qty = 1)
+    {
+        TryGetValue(productId, out var value);
+        value += qty;
+        SetPositionQuantity(productId, value);
+    }
+
+    private void SetPositionQuantity(string productId, int qty)
     {
         if (qty > 0)
         {
