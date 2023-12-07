@@ -1,63 +1,74 @@
 ﻿using FoodShop.Api.Basket.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Net.Http.Headers;
+using System.Net.Http;
 using System.Text.Json;
 
 namespace FoodShop.Api.Basket.Controllers;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class BasketController : ControllerBase
 {
     private readonly IDistributedCache _cache;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IConfiguration _configuration;
 
-    public BasketController(IDistributedCache cache)
+    public BasketController(IDistributedCache cache, IHttpContextAccessor httpContextAccessor, IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _cache = cache;
+        _httpContextAccessor = httpContextAccessor;
+        _httpClientFactory = httpClientFactory;
+        _configuration = configuration;
     }
 
-    private string GetBasketCacheKey(string id) => $"basket/{id}";
+    private string GetBasketId() => _httpContextAccessor.HttpContext!.User.Identity!.Name!;
+    private string GetBasketCacheKey() => $"basket/{GetBasketId()}";
 
     [HttpGet]
-    public async Task<IActionResult> Get(string id)
+    public async Task<IActionResult> Get()
     {
-        var basket = await EnsureBasket(id);
-        return Ok(basket);
+        var basket = await EnsureBasket();
+        var calculatedBasket = await GetCalculatedBasket(basket);
+        return Ok(calculatedBasket);
     }
 
 
     [HttpPost("add")]
-    public async Task<IActionResult> Add(string id, string product, int qty = 1)
+    public async Task<IActionResult> Add(string product, int qty = 1)
     {
-        CustomerBasket basket = await EnsureBasket(id);
+        CustomerBasket basket = await EnsureBasket();
 
         basket.Items.AddQuantity(product, qty);
 
-        SaveBasket(id, basket);
+        await SaveBasket(basket);
 
-        return Ok(basket);
+        var calculatedBasket = await GetCalculatedBasket(basket);
+        return Ok(calculatedBasket);
     }
 
 
     [HttpPost("set")]
-    public async Task<IActionResult> Set(string id, string product, int qty)
+    public async Task<IActionResult> Set(string product, int qty)
     {
-        CustomerBasket basket = await EnsureBasket(id);
+        CustomerBasket basket = await EnsureBasket();
 
         basket.Items.SetQuantity(product, qty);
 
-        SaveBasket(id, basket);
+        await SaveBasket(basket);
 
-        return Ok(basket);
+        var calculatedBasket = await GetCalculatedBasket(basket);
+        return Ok(calculatedBasket);
     }
 
 
-    private async Task<CustomerBasket> EnsureBasket(string id)
+    private async Task<CustomerBasket> EnsureBasket()
     {
-        var key = GetBasketCacheKey(id);
+        var key = GetBasketCacheKey();
         var value = await _cache.GetStringAsync(key);
 
         CustomerBasket basket;
@@ -73,10 +84,38 @@ public class BasketController : ControllerBase
         return basket;
     }
 
-    private void SaveBasket(string id, CustomerBasket basket)
+    private async Task SaveBasket(CustomerBasket basket)
     {
-        var key = GetBasketCacheKey(id);
-        var value = JsonSerializer.Serialize(basket);
-        _cache.SetString(key, value);
+        var key = GetBasketCacheKey();
+        if (basket.Items.Any())
+        {
+            var value = JsonSerializer.Serialize(basket);
+            await _cache.SetStringAsync(key, value);
+        }
+        else
+        {
+            await _cache.RemoveAsync(key);
+        }
+    }
+
+
+    private async Task<string> GetCalculatedBasket(CustomerBasket basket)
+    {
+        var httpClient = _httpClientFactory.CreateClient();
+        var url = _configuration["ApiUrls:FoodShop.Api.Catalog"];
+
+        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url)
+        {
+            Headers =
+            {
+                { HeaderNames.Authorization, Request.Headers.Authorization.FirstOrDefault() }
+            },
+            Content = JsonContent.Create(basket)
+        };
+
+        var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+        var result = await httpResponseMessage.Content.ReadAsStringAsync();
+
+        return result;
     }
 }

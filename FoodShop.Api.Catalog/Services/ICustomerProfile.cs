@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using FoodShop.Core.Models;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 using System.Text.Json;
 
