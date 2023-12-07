@@ -34,8 +34,7 @@ const Basket = () => {
                             <div>{product.popularity}</div>
                             <div className="product-item-price">{product.price}</div>
                             <div className="product-item-qty">{product.quantity}</div>
-                            <div className="product-item-offer-amount">{product.offerAmount}</div>
-                            <div><button>Add</button></div>
+                            <div className="product-item-offer-amount">{product.offerAmount}</div>                            
                         </div>
                     );
                 })}
