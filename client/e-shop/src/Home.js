@@ -94,7 +94,7 @@ const Home = () => {
           return j.token;
         }
         if(r.status == 401){
-          auth.singOut();
+          auth.signOut();
         }
       }).catch(e => {
         
@@ -107,7 +107,7 @@ const Home = () => {
 
     if(auth.anonymousToken){
       if(auth.anonymousToken === issuedToken){
-        auth.singOutAnonymous();
+        auth.signOutAnonymous();
       }else{
         return auth.anonymousToken;        
       }
@@ -118,7 +118,7 @@ const Home = () => {
       .then(async r => {
         if(r.ok){
           const j = await r.json();
-          auth.singInAnonymous(j.token);
+          auth.signInAnonymous(j.token);
           return j.token;
         } 
       })
