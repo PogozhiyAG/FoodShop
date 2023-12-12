@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -80,17 +81,9 @@ public class AuthenticationController : ControllerBase
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody]RefreshRequest refreshRequest)
     {
-        var principal = GetPrincipalFromToken(refreshRequest.Token);
-        var userName = principal.Identity?.Name;
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshRequest.RefreshToken);
 
-        if(userName == null)
-        {
-            return Unauthorized();
-        }
-
-        var user = await _userManager.FindByNameAsync(userName);
-
-        if(user == null || user.RefreshToken != refreshRequest.RefreshToken || user.RefreshTokenExpired < DateTime.UtcNow)
+        if(user == null || user.RefreshTokenExpired < DateTime.UtcNow)
         {
             return Unauthorized();
         }
@@ -156,7 +149,7 @@ public class AuthenticationController : ControllerBase
         };
 
         var result = new JwtSecurityToken(
-            issuer:  _jwtBearerOptions.Value.TokenValidationParameters.ValidIssuer,
+            issuer: _jwtBearerOptions.Value.TokenValidationParameters.ValidIssuer,
             audience: _jwtBearerOptions.Value.TokenValidationParameters.ValidAudience,
             claims: claims,
             expires: DateTime.UtcNow.Add(TimeSpan.Parse(_configuration["JWT:TokenLifetime"])),

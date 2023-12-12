@@ -33,9 +33,7 @@ builder.Services.AddScoped<ICustomerProfile, CustomerProfile>();
 
 var app = builder.Build();
 
-
-
-
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -49,7 +47,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseCors("AllowAll");
+
 
 app.MapControllers();
 

@@ -1,12 +1,187 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Product from "./components/Product";
+import useAuth from "./hooks/useAuth";
 
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState('');
+
+  
+
+  let LoginState = {
+    token: null,
+    refreshToken: localStorage.refreshToken,
+    anonymousToken: localStorage.anonymousToken,
+
+    deleteAnonymous: function(){
+      this.anonymousToken = null;
+      delete localStorage.anonymousToken;
+    },
+
+    processLogin: function (token , refreshToken) {
+      this.token = token;
+      this.refreshToken = refreshToken;
+      localStorage.refreshToken = refreshToken;
+    },
+    processAnonymous: function (token) {
+      this.token = token;
+      this.refreshToken = null;
+      this.anonymousToken = token;
+      localStorage.anonymousToken = token;
+      delete localStorage.refreshToken;
+    },
+    processLogout: function () {
+      this.token = null;
+      this.refreshToken = null;
+      delete localStorage.refreshToken;
+    }
+  }
+
+ 
+
+  const login = async () => await fetch('https://localhost:11443/Authentication/login', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({
+        "userName": "string",
+        "password": "String@1"
+      })
+      }).then(async r => {
+        if(r.ok){
+          const j = await r.json();
+          LoginState.processLogin(j.token, j.refreshToken);
+          return j.token;
+        } 
+        if(r.status == 401){
+          console.log('Invalid login or password');
+        }
+      }).catch(e => {
+
+      });
+
+
+
+
+  const getAccessToken = async (issuedToken) => {   
+    let result = null; 
+
+    if(LoginState.token){
+      if(!issuedToken || LoginState.token !== issuedToken){
+        return LoginState.token;
+      }
+    }
+
+
+    if(LoginState.refreshToken){
+      console.log('DEBUG: We are going to refresh');
+
+      result = await fetch('https://localhost:11443/Authentication/refresh', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({refreshToken: LoginState.refreshToken})
+      })
+      .then(async r => {
+        if(r.ok){
+          const j = await r.json();
+          LoginState.processLogin(j.token, j.refreshToken);
+          return j.token;
+        }
+        if(r.status == 401){
+          LoginState.processLogout();
+        }
+      }).catch(e => {
+        
+      });
+    }
+
+
+    if(result) return result;
+
+
+    if(LoginState.anonymousToken){
+      if(LoginState.anonymousToken === issuedToken){
+        LoginState.deleteAnonymous();
+      }else{
+        return LoginState.anonymousToken;        
+      }
+    }
+
+    console.log('DEBUG: We are going to switch to anonymous');
+    result = await fetch('https://localhost:11443/Authentication/anonymous')      
+      .then(async r => {
+        if(r.ok){
+          const j = await r.json();
+          LoginState.processAnonymous(j.token);
+          return j.token;
+        } 
+      })
+      .catch(e => {
+
+      });
+
+    if(result) return result;
+  };
+
+
+  let requestPromise = null;
+  const getAccessTokenSafe = async (issuedToken) =>{
+    if(requestPromise == null){
+      console.log('DBG_AT');
+      requestPromise = getAccessToken(issuedToken);
+    }
+
+    const accessToken =  await requestPromise;
+    requestPromise = null;
+    return accessToken;
+  };
+
+
+
+  const getData = async (url, requestOptions) => {
+    let token; 
+    let repeat = 2;
+    let result;
+    let error;
+
+    do {
+      token = await getAccessTokenSafe(token);
+
+      await fetch(url, {
+        ...requestOptions,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      .then(async r => {
+        result = r;  
+        if(r.ok){
+          repeat = 0;
+        } else if(r.status == 401) {
+          repeat--;
+        } else {
+          repeat = 0;
+        }
+      })
+      .catch(e => {
+        error = e;
+        repeat = 0;
+      });
+
+    } while (repeat)
+
+
+    if(error) return Promise.reject(error);
+    if(result) return Promise.resolve(result);
+  }
+
+
 
   const getDataUrl = () => {
     let url = 'https://localhost:10443/Catalog?';
@@ -15,15 +190,16 @@ const Home = () => {
     return url;
   }
 
+
+
   useEffect(() => {
-    fetch(getDataUrl(), {
-      headers: {
-        Authorization: 'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiSldUIn0.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYjA4Zjg0MWUtNzA3Zi00NTZlLWIwNzMtZWExZTI0YTQ5ZDkzIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvYW5vbnltb3VzIjoiYjA4Zjg0MWUtNzA3Zi00NTZlLWIwNzMtZWExZTI0YTQ5ZDkzIiwiZXhwIjo0ODU3NjQ3MjQ1LCJpc3MiOiJGb29kU2hvcC5BcGkuQXV0aCIsImF1ZCI6IkZvb2RTaG9wIn0.I3M0C66KqJL-UPjkZ8z_4rvXjKpTad3UhpHfRfUKQLakPIFjAa9zO-Ek-HxAIjPySCewuaQ2xZKwsq_b4DYrmPvT-8ncCmyjSbXzq7dHCi_7sA07UFUIhzVnN7-7CCYBauegPS63cRZpzyCAorxf6BWCn7W4Mu_jbuS71zmzqRs'
-      }
-    })
-    .then(r => r.json())
-    .then(r => setProducts(r))
+    getData(getDataUrl())
+    .then(async r => {
+      setProducts(await r.json());
+    });
   }, [searchText, sortOrder]);
+
+ 
 
 
   return (
@@ -32,6 +208,7 @@ const Home = () => {
       <header className="header">
         <img src="logo.png" style={{width: '50px', height: '50px'}}/>
         <Link to="/basket">Basket</Link>
+        <Link to="/login">Login</Link>
       </header>
     
 
@@ -71,7 +248,7 @@ const Home = () => {
         </section>
 
         <section className="row section">
-          {products.map(product => <Product product={product}/>)}
+          {products.map(product => <Product key={product.id} product={product}/>)}
         </section>
       </main>
     </>
