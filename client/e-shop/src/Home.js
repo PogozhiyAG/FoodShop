@@ -8,61 +8,61 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState('');
-
+  const auth = useAuth();
   
 
-  let LoginState = {
-    token: null,
-    refreshToken: localStorage.refreshToken,
-    anonymousToken: localStorage.anonymousToken,
+  // let LoginState = {
+  //   token: null,
+  //   refreshToken: localStorage.refreshToken,
+  //   anonymousToken: localStorage.anonymousToken,
 
-    deleteAnonymous: function(){
-      this.anonymousToken = null;
-      delete localStorage.anonymousToken;
-    },
+  //   deleteAnonymous: function(){
+  //     this.anonymousToken = null;
+  //     delete localStorage.anonymousToken;
+  //   },
 
-    processLogin: function (token , refreshToken) {
-      this.token = token;
-      this.refreshToken = refreshToken;
-      localStorage.refreshToken = refreshToken;
-    },
-    processAnonymous: function (token) {
-      this.token = token;
-      this.refreshToken = null;
-      this.anonymousToken = token;
-      localStorage.anonymousToken = token;
-      delete localStorage.refreshToken;
-    },
-    processLogout: function () {
-      this.token = null;
-      this.refreshToken = null;
-      delete localStorage.refreshToken;
-    }
-  }
+  //   processLogin: function (token , refreshToken) {
+  //     this.token = token;
+  //     this.refreshToken = refreshToken;
+  //     localStorage.refreshToken = refreshToken;
+  //   },
+  //   processAnonymous: function (token) {
+  //     this.token = token;
+  //     this.refreshToken = null;
+  //     this.anonymousToken = token;
+  //     localStorage.anonymousToken = token;
+  //     delete localStorage.refreshToken;
+  //   },
+  //   processLogout: function () {
+  //     this.token = null;
+  //     this.refreshToken = null;
+  //     delete localStorage.refreshToken;
+  //   }
+  // }
 
  
 
-  const login = async () => await fetch('https://localhost:11443/Authentication/login', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify({
-        "userName": "string",
-        "password": "String@1"
-      })
-      }).then(async r => {
-        if(r.ok){
-          const j = await r.json();
-          LoginState.processLogin(j.token, j.refreshToken);
-          return j.token;
-        } 
-        if(r.status == 401){
-          console.log('Invalid login or password');
-        }
-      }).catch(e => {
+  // const login = async () => await fetch('https://localhost:11443/Authentication/login', {
+  //     method: 'POST',
+  //     headers: { 
+  //       'Content-Type': 'application/json' 
+  //     },
+  //     body: JSON.stringify({
+  //       "userName": "string",
+  //       "password": "String@1"
+  //     })
+  //     }).then(async r => {
+  //       if(r.ok){
+  //         const j = await r.json();
+  //         LoginState.processLogin(j.token, j.refreshToken);
+  //         return j.token;
+  //       } 
+  //       if(r.status == 401){
+  //         console.log('Invalid login or password');
+  //       }
+  //     }).catch(e => {
 
-      });
+  //     });
 
 
 
@@ -70,14 +70,14 @@ const Home = () => {
   const getAccessToken = async (issuedToken) => {   
     let result = null; 
 
-    if(LoginState.token){
-      if(!issuedToken || LoginState.token !== issuedToken){
-        return LoginState.token;
+    if(auth.token){
+      if(!issuedToken || auth.token !== issuedToken){
+        return auth.token;
       }
     }
 
 
-    if(LoginState.refreshToken){
+    if(auth.refreshToken){
       console.log('DEBUG: We are going to refresh');
 
       result = await fetch('https://localhost:11443/Authentication/refresh', {
@@ -85,16 +85,16 @@ const Home = () => {
         headers: { 
           'Content-Type': 'application/json' 
         },
-        body: JSON.stringify({refreshToken: LoginState.refreshToken})
+        body: JSON.stringify({refreshToken: auth.refreshToken})
       })
       .then(async r => {
         if(r.ok){
           const j = await r.json();
-          LoginState.processLogin(j.token, j.refreshToken);
+          auth.signIn(j.token, j.refreshToken);
           return j.token;
         }
         if(r.status == 401){
-          LoginState.processLogout();
+          auth.singOut();
         }
       }).catch(e => {
         
@@ -105,11 +105,11 @@ const Home = () => {
     if(result) return result;
 
 
-    if(LoginState.anonymousToken){
-      if(LoginState.anonymousToken === issuedToken){
-        LoginState.deleteAnonymous();
+    if(auth.anonymousToken){
+      if(auth.anonymousToken === issuedToken){
+        auth.singOutAnonymous();
       }else{
-        return LoginState.anonymousToken;        
+        return auth.anonymousToken;        
       }
     }
 
@@ -118,7 +118,7 @@ const Home = () => {
       .then(async r => {
         if(r.ok){
           const j = await r.json();
-          LoginState.processAnonymous(j.token);
+          auth.singInAnonymous(j.token);
           return j.token;
         } 
       })
@@ -128,6 +128,9 @@ const Home = () => {
 
     if(result) return result;
   };
+
+
+
 
 
   let requestPromise = null;
@@ -224,7 +227,7 @@ const Home = () => {
           <a href="#" className="category-galery-item category-galery-item-three p-5 col-md-2 col-sm-12">Vegitables</a>
           <a href="#" className="category-galery-item category-galery-item-two p-5 col-md-2 col-sm-12">Fruit</a>
           <a href="#" className="category-galery-item category-galery-item-three p-5 col-md-4 col-sm-12">Sweets</a>
-          <a href="#" className="category-galery-item category-galery-item-one p-5 col-md-4 col-sm-12">To-Go</a>
+          <a href="#" className="category-galery-item category-galery-item-one p-5 col-md-4 col-sm-12">Take away</a>
         </section>
 
         <section className="section">

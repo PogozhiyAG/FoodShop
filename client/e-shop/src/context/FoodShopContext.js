@@ -1,39 +1,12 @@
-import { createContext, useState } from "react";
+import { createContext } from "react";
+import AuthState from "../api/authState";
+
 
 const FoodShopContext = createContext({});
 
 export const FoodShopProvider = ({children}) => {
-    const [token, setToken] = useState();
-    const [refreshToken, setRefreshToken] = useState(localStorage.refreshToken);
-    const [anonymousToken, setAnonymousToken] = useState(localStorage.refreshToken);
 
-    
-
-    const setAnonymous = (at) => {
-        setToken(at);
-
-        setAnonymousToken(at);
-        localStorage.anonymousToken = at;
-
-        delete localStorage.refreshToken;
-        setRefreshToken(null);
-        
-    };
-
-    const setSignIn = (t, rt) => {
-        setToken(t);
-
-        localStorage.refreshToken = rt;
-        setRefreshToken(rt);
-    };
-
-    const value = {
-        token, setToken,
-        refreshToken, setRefreshToken,
-        anonymousToken, setAnonymousToken,
-        setAnonymous,
-        setSignIn
-    };
+    const value = AuthState();
 
     return (
         <FoodShopContext.Provider value={value}>

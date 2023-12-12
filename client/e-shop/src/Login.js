@@ -2,27 +2,29 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "./hooks/useAuth";
 
-const Login = () => {
-    const auth = useAuth();
+const Login = () => {    
     const [userName, setUserName] = useState();
     const [password, setPassword] = useState();
+    const auth = useAuth();
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        fetch('https://localhost:11443/Authentication/login', {
+        await fetch('https://localhost:11443/Authentication/login', {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({userName, password})
         })
-        .then(r => {
+        .then(async r => {
             if(r.ok){
-                return r.json();
+                const j = await r.json();                
+                auth.signIn(j.token, j.refreshToken);                
+                return;
+            } else if(r.status == 401){
+                return Promise.reject(new Error('Login or password is incorrect'));    
             }
-            return new Promise.reject(new Error('Smt went wrong'));
-        })
-        .then(r => {            
-            auth.setSignIn(r.token, r.refreshToken);
+            return Promise.reject(new Error('Smth went wrong'));
         })
         .catch(e => console.log(e));
     };
