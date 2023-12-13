@@ -24,9 +24,9 @@ const Basket = () => {
             <h1>Basket</h1>
             <Link to="/">Home</Link>
             <section className="row section">
-                {products.map(product => {
+                {products.map((product, i) => {
                     return (
-                        <div className="col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2 product-item">
+                        <div key={i} className="col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2 product-item">
                             <img src="food.jpg" className="product-image"/>
                             <div className="product-item-description">{product.name}</div>
                             

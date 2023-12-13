@@ -84,7 +84,7 @@ const useHttpClient = () => {
     
         do {
           token = await getAccessTokenSafe(token);
-    
+        
           await fetch(url, {
             ...requestOptions,
             headers: {
