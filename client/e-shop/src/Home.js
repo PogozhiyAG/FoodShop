@@ -212,6 +212,7 @@ const Home = () => {
         <img src="logo.png" style={{width: '50px', height: '50px'}}/>
         <Link to="/basket">Basket</Link>
         <Link to="/login">Login</Link>
+        <span className="p-2">{auth.refreshToken ? 'Logged in' : 'Anonymous'}</span>
       </header>
     
 
