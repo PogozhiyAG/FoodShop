@@ -41,6 +41,7 @@ const Login = () => {
             </form>
 
             <div>{JSON.stringify(auth)}</div>
+           
         </>
     );
 };

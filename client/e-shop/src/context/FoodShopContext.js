@@ -6,10 +6,10 @@ const FoodShopContext = createContext({});
 
 export const FoodShopProvider = ({children}) => {
 
-    const value = AuthState();
+    //const value = new AuthState();
 
     return (
-        <FoodShopContext.Provider value={value}>
+        <FoodShopContext.Provider value={1}>
             {children}
         </FoodShopContext.Provider>
     );

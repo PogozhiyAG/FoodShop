@@ -70,6 +70,9 @@ const Home = () => {
   const getAccessToken = async (issuedToken) => {   
     let result = null; 
 
+    console.log('issued:', issuedToken);
+    console.log('current:', auth.token);
+
     if(auth.token){
       if(!issuedToken || auth.token !== issuedToken){
         return auth.token;
@@ -133,15 +136,18 @@ const Home = () => {
 
 
 
-  let requestPromise = null;
-  const getAccessTokenSafe = async (issuedToken) =>{
-    if(requestPromise == null){
-      console.log('DBG_AT');
-      requestPromise = getAccessToken(issuedToken);
-    }
+  
+  const getAccessTokenSafe = async (issuedToken) => {
+    let accessToken;
 
-    const accessToken =  await requestPromise;
-    requestPromise = null;
+    console.log('L_W');
+    await navigator.locks.request('REFRESH_TOKEN', async lock => {
+      console.log('L_AQ');
+      accessToken = await getAccessToken(issuedToken);
+      console.log('L_AQ_E');
+    });
+
+    console.log('L_R', accessToken);
     return accessToken;
   };
 

@@ -81,10 +81,13 @@ public class AuthenticationController : ControllerBase
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody]RefreshRequest refreshRequest)
     {
+        await Console.Out.WriteLineAsync(refreshRequest.RefreshToken);
+
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshRequest.RefreshToken);
 
         if(user == null || user.RefreshTokenExpired < DateTime.UtcNow)
         {
+            await Console.Out.WriteLineAsync("Unauthorized");
             return Unauthorized();
         }
 
