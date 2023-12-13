@@ -1,27 +1,121 @@
-import { useEffect } from "react";
-import httpClient from "../api/httpClient";
 import useAuth from './useAuth';
 
+const AuthApiUrls = {
+    RefreshUrl: 'https://localhost:11443/Authentication/refresh',
+    AnonymousUrl: 'https://localhost:11443/Authentication/anonymous'
+};
+
 const useHttpClient = () => {    
-    const {auth} = useAuth();
+    const auth = useAuth();
 
-    useEffect(() => {
-        const requestInterceptor = httpClient.interceptors.request.use(
-            config => {
-                //config.headers['Authorization'] = `Bearer ${auth.token}`
-                config.headers['Authorization'] = 'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiSldUIn0.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYjA4Zjg0MWUtNzA3Zi00NTZlLWIwNzMtZWExZTI0YTQ5ZDkzIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvYW5vbnltb3VzIjoiYjA4Zjg0MWUtNzA3Zi00NTZlLWIwNzMtZWExZTI0YTQ5ZDkzIiwiZXhwIjo0ODU3NjQ3MjQ1LCJpc3MiOiJGb29kU2hvcC5BcGkuQXV0aCIsImF1ZCI6IkZvb2RTaG9wIn0.I3M0C66KqJL-UPjkZ8z_4rvXjKpTad3UhpHfRfUKQLakPIFjAa9zO-Ek-HxAIjPySCewuaQ2xZKwsq_b4DYrmPvT-8ncCmyjSbXzq7dHCi_7sA07UFUIhzVnN7-7CCYBauegPS63cRZpzyCAorxf6BWCn7W4Mu_jbuS71zmzqRs'
+    const getAccessToken = async (issuedToken) => {   
+        let result = null; 
+
+        if(auth.token){
+          if(!issuedToken || auth.token !== issuedToken){
+            return auth.token;
+          }
+        }
+        
+        if(auth.refreshToken){    
+          result = await fetch(AuthApiUrls.RefreshUrl, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json' 
             },
-            error => {
-                return new Promise.reject(error);
+            body: JSON.stringify({refreshToken: auth.refreshToken})
+          })
+          .then(async r => {
+            if(r.ok){
+              const j = await r.json();
+              auth.signIn(j.token, j.refreshToken);
+              return auth.token;
             }
-        );
+            if(r.status == 401){
+              auth.signOut();
+            }
+          }).catch(e => {
+            
+          });
+        }    
+    
+        if(result) return result;    
+    
+        if(auth.anonymousToken){
+          if(auth.anonymousToken === issuedToken){
+            auth.signOutAnonymous();
+          }else{
+            return auth.anonymousToken;        
+          }
+        }
+            
+        result = await fetch(AuthApiUrls.AnonymousUrl)      
+          .then(async r => {
+            if(r.ok){
+              const j = await r.json();
+              auth.signInAnonymous(j.token);
+              return auth.token;
+            } 
+          })
+          .catch(e => {
+    
+          });
+    
+        return result;
+      };
+    
+      
+      const getAccessTokenSafe = async (issuedToken) => {
+        let accessToken;
 
-        return () => {
-            httpClient.interceptors.request.eject(requestInterceptor);
-        };
-    }, [auth]);
+        await navigator.locks.request('REFRESH_TOKEN', async lock => {          
+          accessToken = await getAccessToken(issuedToken);
+        });
 
-    return httpClient;
+        return accessToken;
+      };
+        
+    
+      const getData = async (url, requestOptions) => {
+        let token; 
+        let repeat = 2;
+        let result;
+        let error;
+    
+        do {
+          token = await getAccessTokenSafe(token);
+    
+          await fetch(url, {
+            ...requestOptions,
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          .then(async r => {
+            result = r;  
+            if(r.ok){
+              repeat = 0;
+            } else if(r.status == 401) {
+              repeat--;
+            } else {
+              repeat = 0;
+            }
+          })
+          .catch(e => {
+            error = e;
+            repeat = 0;
+          });
+    
+        } while (repeat)
+    
+    
+        if(error) return Promise.reject(error);
+        if(result) return Promise.resolve(result);
+      };
+
+    return {
+        getData
+    };
 };
 
 export default useHttpClient;

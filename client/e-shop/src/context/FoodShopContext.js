@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import AuthState from "../api/authState";
+import AuthState from "../services/authState";
 
 
 const FoodShopContext = createContext({});

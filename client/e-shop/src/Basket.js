@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Product from "./components/Product";
+import useHttpClient from "./hooks/useHttpClient";
 
 const Basket = () => {
   const [products, setProducts] = useState([]);
+  const {getData} = useHttpClient();
   
   const getDataUrl = () => {
     let url = 'https://localhost:13443/Basket';
@@ -11,11 +13,7 @@ const Basket = () => {
   }
 
   useEffect(() => {
-    fetch(getDataUrl(), {
-      headers: {
-        Authorization: 'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiSldUIn0.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYjA4Zjg0MWUtNzA3Zi00NTZlLWIwNzMtZWExZTI0YTQ5ZDkzIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvYW5vbnltb3VzIjoiYjA4Zjg0MWUtNzA3Zi00NTZlLWIwNzMtZWExZTI0YTQ5ZDkzIiwiZXhwIjo0ODU3NjQ3MjQ1LCJpc3MiOiJGb29kU2hvcC5BcGkuQXV0aCIsImF1ZCI6IkZvb2RTaG9wIn0.I3M0C66KqJL-UPjkZ8z_4rvXjKpTad3UhpHfRfUKQLakPIFjAa9zO-Ek-HxAIjPySCewuaQ2xZKwsq_b4DYrmPvT-8ncCmyjSbXzq7dHCi_7sA07UFUIhzVnN7-7CCYBauegPS63cRZpzyCAorxf6BWCn7W4Mu_jbuS71zmzqRs'
-      }
-    })
+    getData(getDataUrl())
     .then(r => r.json())
     .then(r => setProducts(r))
   }, []);
