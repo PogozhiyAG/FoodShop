@@ -15,28 +15,36 @@ const Basket = () => {
   useEffect(() => {
     getData(getDataUrl())
     .then(r => r.json())
-    .then(r => setProducts(r))
+    .then(r => {
+        setProducts(r)
+    })
   }, []);
 
 
     return (
         <>
             <h1>Basket</h1>
-            <Link to="/">Home</Link>
-            <section className="row section">
-                {products.map((product, i) => {
-                    return (
-                        <div key={i} className="col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2 product-item">
-                            <img src="food.jpg" className="product-image"/>
-                            <div className="product-item-description">{product.name}</div>
-                            
-                            <div className="product-item-price">{product.basePrice}</div>
-                            <div className="product-item-qty">{product.quantity}</div>
-                            <div className="product-item-offer-amount">{product.offerAmount} ({product.baseAmount})</div>                            
-                        </div>
-                    );
-                })}
-                
+            
+            <section className="row section"> 
+                <div className="d-flex">
+                    <Link to="/">Home</Link>
+                    <span className="h2">{products.reduce((a, p) => a + p.offerAmount, 0).toFixed(2) }</span>
+                </div>               
+                <table>
+                    <tbody>
+                        {products.map((product, i) => {
+                            return (
+                                <tr key={i}>
+                                    <td><img src="food.jpg" className="basket-product-image"/></td>
+                                    <td>{product.name}</td>
+                                    <td>{product.basePrice}</td>
+                                    <td>{product.quantity}</td>
+                                    <td>{product.offerAmount} ({product.baseAmount})</td>
+                                </tr>                       
+                            );
+                        })}
+                    </tbody>
+                </table>
             </section>
         </>
     );

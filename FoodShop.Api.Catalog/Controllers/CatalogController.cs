@@ -50,7 +50,7 @@ public class CatalogController : ControllerBase
 
         if (!string.IsNullOrEmpty(text))
         {
-            q = q.Where(p => EF.Functions.Contains(p.Name, text));
+            q = q.Where(p => EF.Functions.Contains(p.Name, GetFullTextCriteria(text)));
         }
 
         if (tagId.HasValue)
@@ -187,5 +187,11 @@ public class CatalogController : ControllerBase
         }
 
         return await _customerProfile.GetTokenTypes(principal.Identity.Name);
+    }
+
+    private string GetFullTextCriteria(string text)
+    {
+        text = text.Replace("~", " ");
+        return string.Join(" ~ ", text.Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(w => $"\"{w}*\""));
     }
 }

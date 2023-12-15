@@ -67,14 +67,14 @@
 
 
 
-
-
-
-
-
-
 .row{
   margin-left: 0;
   margin-right: 0;
 }
 
+
+
+.basket-product-image{
+  width: 5rem;  
+  object-fit: cover;
+}
