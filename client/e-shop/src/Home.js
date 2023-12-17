@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import Product from "./components/Product";
 import useHttpClient from "./hooks/useHttpClient";
 import useAuth from "./hooks/useAuth";
+import useBasketContext from "./hooks/useContextBasket";
 
 
 const Home = () => {
+  const basket = useBasketContext();
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
@@ -21,6 +23,9 @@ const Home = () => {
     return url;
   }
 
+  useEffect(() => {
+    basket.reloadBasket()
+  }, []);
 
 
   useEffect(() => {
@@ -38,9 +43,10 @@ const Home = () => {
     
       <header className="header">
         <img src="logo.png" style={{width: '50px', height: '50px'}}/>
-        <Link to="/basket">Basket</Link>
-        <Link to="/login">Login</Link>
+        <Link className="p-2" to="/basket">Basket</Link>
+        <Link className="p-2" to="/login">Login</Link>
         <span className="p-2">{authSync.refreshToken ? 'Logged in' : 'Anonymous'}</span>
+        <span className="m-2 h2 badge badge-success">{basket.getTotalAmount()}</span>
       </header>
     
 

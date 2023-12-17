@@ -1,14 +1,15 @@
-import useHttpClient from "../hooks/useHttpClient";
-
+import useBasketContext from "../hooks/useContextBasket";
 
 
 const Product = ({product}) => {
-    const {getData} = useHttpClient();
+    const basket = useBasketContext();
 
     const handleAddToBasket = () => {
-        getData(`https://localhost:13443/Basket/add?product=${product.id}`, {method: 'POST'})
-        .then(r => r.json())
-        .then(r => console.log(r));
+        basket.addToBasket(product.id, 1);
+    }
+
+    const handleRemoveToBasket = () => {
+        basket.addToBasket(product.id, -1);
     }
 
     return(
@@ -17,7 +18,11 @@ const Product = ({product}) => {
             <div className="product-item-description">{product.name}</div>
             <div>{product.popularity}</div>
             <div className="product-item-price">{product.price}</div>
-            <div><button onClick={handleAddToBasket}>Add</button></div>
+            <div className="d-flex justify-content-between">
+                <button className="basket-button" onClick={handleAddToBasket}>Add</button>
+                <span className="m-2">{basket.getPosition(product.id)?.quantity}</span>
+                <button className="basket-button" onClick={handleRemoveToBasket}>Remove</button>
+            </div>
         </div>
     );
 }

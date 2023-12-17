@@ -1,15 +1,19 @@
-import { createContext } from "react";
-import AuthState from "../services/authState";
+import { createContext, useEffect } from "react";
+import useBasket from "../hooks/useBasket";
 
 
 const FoodShopContext = createContext({});
 
 export const FoodShopProvider = ({children}) => {
 
-    //const value = new AuthState();
+    const basket = useBasket();
 
+    const value = {
+        basket
+    };
+    
     return (
-        <FoodShopContext.Provider value={1}>
+        <FoodShopContext.Provider value={value}>
             {children}
         </FoodShopContext.Provider>
     );

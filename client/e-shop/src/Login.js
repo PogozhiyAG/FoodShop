@@ -40,8 +40,11 @@ const Login = () => {
                 <button>Sign in</button>
             </form>
 
-            
+            <hr/>
             <div>{JSON.stringify(authSync)}</div>           
+
+            <hr/>
+            <button onClick={() => authState.signOut()}>Sign out</button>
         </>
     );
 };
