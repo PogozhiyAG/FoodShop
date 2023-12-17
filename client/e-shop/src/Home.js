@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Product from "./components/Product";
-import useAuth from "./hooks/useAuth";
 import useHttpClient from "./hooks/useHttpClient";
+import useAuth from "./hooks/useAuth";
 
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
-  const [authState, authSync] = useAuth();
+  const authSync = useAuth();
   const {getData} = useHttpClient();
 
 

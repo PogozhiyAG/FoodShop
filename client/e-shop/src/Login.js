@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import useAuth from "./hooks/useAuth";
+import useAuth, { authState } from "./hooks/useAuth";
 
 
 const Login = () => {    
     const [userName, setUserName] = useState();
     const [password, setPassword] = useState();
-    const [authState, authSync] = useAuth();
+    const authSync = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
