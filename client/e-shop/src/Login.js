@@ -2,13 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "./hooks/useAuth";
 
+
 const Login = () => {    
     const [userName, setUserName] = useState();
     const [password, setPassword] = useState();
-    const [_forceRender, setForceRender] = useState();
-    const forceRender = () => setForceRender(Math.random());
-    const auth = useAuth();
-
+    const [authState, authSync] = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,7 +19,7 @@ const Login = () => {
         .then(async r => {
             if(r.ok){
                 const j = await r.json();                
-                auth.signIn(j.token, j.refreshToken);                 
+                authState.signIn(j.token, j.refreshToken);
                 return;
             } else if(r.status == 401){
                 return Promise.reject(new Error('Login or password is incorrect'));    
@@ -29,8 +27,6 @@ const Login = () => {
             return Promise.reject(new Error('Smth went wrong'));
         })
         .catch(e => console.log(e));
-
-        forceRender();
     };
 
     return (
@@ -44,8 +40,8 @@ const Login = () => {
                 <button>Sign in</button>
             </form>
 
-            <div>{JSON.stringify(auth)}</div>
-           
+            
+            <div>{JSON.stringify(authSync)}</div>           
         </>
     );
 };

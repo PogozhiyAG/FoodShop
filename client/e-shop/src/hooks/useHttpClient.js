@@ -6,33 +6,33 @@ const AuthApiUrls = {
 };
 
 const useHttpClient = () => {    
-  const auth = useAuth();
+  const [authState, authSync] = useAuth();
 
   const getAccessToken = async (issuedToken) => {   
       let result = null; 
 
-      if(auth.token){
-        if(!issuedToken || auth.token !== issuedToken){
-          return auth.token;
+      if(authState.token){
+        if(!issuedToken || authState.token !== issuedToken){
+          return authState.token;
         }
       }
       
-      if(auth.refreshToken){    
+      if(authState.refreshToken){    
         result = await fetch(AuthApiUrls.RefreshUrl, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json' 
           },
-          body: JSON.stringify({refreshToken: auth.refreshToken})
+          body: JSON.stringify({refreshToken: authState.refreshToken})
         })
         .then(async r => {
           if(r.ok){
             const j = await r.json();
-            auth.signIn(j.token, j.refreshToken);
-            return auth.token;
+            authState.signIn(j.token, j.refreshToken);
+            return authState.token;
           }
           if(r.status === 401){
-            auth.signOut();
+            authState.signOut();
           }
         }).catch(e => {
           
@@ -41,11 +41,11 @@ const useHttpClient = () => {
   
       if(result) return result;    
   
-      if(auth.anonymousToken){
-        if(auth.anonymousToken === issuedToken){
-          auth.signOutAnonymous();
+      if(authState.anonymousToken){
+        if(authState.anonymousToken === issuedToken){
+          authState.signOutAnonymous();
         }else{
-          return auth.anonymousToken;        
+          return authState.anonymousToken;        
         }
       }
           
@@ -53,8 +53,8 @@ const useHttpClient = () => {
         .then(async r => {
           if(r.ok){
             const j = await r.json();
-            auth.signInAnonymous(j.token);
-            return auth.token;
+            authState.signInAnonymous(j.token);
+            return authState.token;
           } 
         })
         .catch(e => {

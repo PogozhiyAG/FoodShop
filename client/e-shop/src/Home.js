@@ -9,7 +9,7 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
-  const auth = useAuth();
+  const [authState, authSync] = useAuth();
   const {getData} = useHttpClient();
 
 
@@ -40,7 +40,7 @@ const Home = () => {
         <img src="logo.png" style={{width: '50px', height: '50px'}}/>
         <Link to="/basket">Basket</Link>
         <Link to="/login">Login</Link>
-        <span className="p-2">{auth.refreshToken ? 'Logged in' : 'Anonymous'}</span>
+        <span className="p-2">{authSync.refreshToken ? 'Logged in' : 'Anonymous'}</span>
       </header>
     
 
