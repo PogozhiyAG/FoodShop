@@ -27,7 +27,7 @@ const useHttpClient = () => {
         .then(async r => {
           if(r.ok){
             const j = await r.json();
-            authState.signIn(j.token, j.refreshToken);
+            authState.signIn(j.token, j.refreshToken, j.userName);
             return authState.token;
           }
           if(r.status === 401){
@@ -53,7 +53,7 @@ const useHttpClient = () => {
           if(r.ok){
             const j = await r.json();
             authState.signInAnonymous(j.token);
-            return authState.token;
+            return authState.anonymousToken;
           } 
         })
         .catch(e => {

@@ -5,5 +5,6 @@
         public required string Token { get; set; }
         public string? RefreshToken { get; set; }
         public bool IsAnonymous { get; set; }
+        public string? UserName { get; set; }
     }
 }

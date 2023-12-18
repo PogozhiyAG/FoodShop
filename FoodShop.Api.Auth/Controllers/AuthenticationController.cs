@@ -71,7 +71,8 @@ public class AuthenticationController : ControllerBase
         var result = new TokenResponse()
         {
             Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
-            RefreshToken = refreshToken
+            RefreshToken = refreshToken,
+            UserName = user.UserName,
         };
 
         return Ok(result);
@@ -101,7 +102,8 @@ public class AuthenticationController : ControllerBase
         var result = new TokenResponse()
         {
             Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
-            RefreshToken = refreshToken
+            RefreshToken = refreshToken,
+            UserName = user.UserName
         };
 
         return Ok(result);

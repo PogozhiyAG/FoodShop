@@ -2,6 +2,7 @@ const AuthState = function () {
     this.token = null;     
     this.refreshToken = localStorage.refreshToken;     
     this.anonymousToken = localStorage.anonymousToken; 
+    this.userName = localStorage.userName;
     
     this.setRefreshToken = t => {
         this.refreshToken = t;
@@ -21,28 +22,41 @@ const AuthState = function () {
         }
     };
 
-    this.signIn = (t, rt) => {
+    this.setUserName = userName => {
+        this.userName = userName;
+        if(userName){
+            localStorage.userName = userName;
+        } else {
+            delete localStorage.userName;
+        }
+    };
+
+    this.signIn = (t, rt, un) => {
         this.token = t;
         this.setRefreshToken(rt);
+        this.setUserName(un);
         this.emitChange();
     };
 
     this.signOut = () => {
         this.token = null;
         this.setRefreshToken(null);
+        this.setUserName(null);
         this.emitChange();
     };
 
     this.signInAnonymous = (t) => {
-        this.token = t;
+        this.token = null;
         this.setAnonymousToken(t);
         this.setRefreshToken(null);
+        this.setUserName(null);
         this.emitChange();
     };
 
     this.signOutAnonymous = () => {
         this.token = null;
         this.setAnonymousToken(null);
+        this.setUserName(null);
         this.emitChange();
     };
 
@@ -54,19 +68,10 @@ const AuthState = function () {
         };
     }
 
-    this.getSnapshot = () => this.snapshot;
     
-    this.updateSnapshot = () => {
-        this.snapshot = {
-            token: this.token,
-            refreshToken: this.refreshToken,
-            anonymousToken: this.anonymousToken
-        };
-    }
-    this.updateSnapshot();
+    this.getSnapshot = () => this.userName ?? 'ANONYMOUS_' + this.anonymousToken;
     
     this.emitChange = () => { 
-        this.updateSnapshot();
         for (let listener of this.listeners) {
           listener();
         }

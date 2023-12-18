@@ -19,7 +19,7 @@ const Login = () => {
         .then(async r => {
             if(r.ok){
                 const j = await r.json();                
-                authState.signIn(j.token, j.refreshToken);
+                authState.signIn(j.token, j.refreshToken, j.userName);
                 return;
             } else if(r.status == 401){
                 return Promise.reject(new Error('Login or password is incorrect'));    

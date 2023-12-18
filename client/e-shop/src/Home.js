@@ -14,7 +14,7 @@ const Home = () => {
   const authSync = useAuth();
   const {getData} = useHttpClient();
 
-
+  const getUserDisplayName = () => authSync.startsWith('ANONYMOUS_') ? 'Anonymous' : authSync;
 
   const getDataUrl = () => {
     let url = 'https://localhost:10443/Catalog?';
@@ -25,7 +25,7 @@ const Home = () => {
 
   useEffect(() => {
     basket.reloadBasket()
-  }, []);
+  }, [authSync]);
 
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const Home = () => {
         <img src="logo.png" style={{width: '50px', height: '50px'}}/>
         <Link className="p-2" to="/basket">Basket</Link>
         <Link className="p-2" to="/login">Login</Link>
-        <span className="p-2">{authSync.refreshToken ? 'Logged in' : 'Anonymous'}</span>
+        <span className="p-2">{getUserDisplayName()}</span>
         <span className="m-2 h2 badge badge-success">{basket.getTotalAmount()}</span>
       </header>
     
