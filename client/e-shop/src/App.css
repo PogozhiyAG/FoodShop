@@ -37,6 +37,7 @@
 
 .product-item{  
   min-height: 25rem;
+  min-width: 200px;
   display: flex;
   flex-direction: column;  
 }
@@ -88,7 +89,7 @@
     border: none;
     border-radius: 6px;
     padding: 6px;
-    min-width: 80px;
+    min-width: 50px;
 }
 
 .basket-added-product{

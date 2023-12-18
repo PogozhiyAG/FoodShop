@@ -13,7 +13,7 @@ const Product = ({product}) => {
     }
 
     const basketQuantity = basket.getPosition(product.id)?.quantity;
-    const productItemStyle = `${basketQuantity ? 'basket-added-product' : ''} col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2 p-3 product-item`;
+    const productItemStyle = `${basketQuantity ? 'basket-added-product' : ''} col p-3 product-item`;
 
     return(
         <div className={productItemStyle}>
@@ -25,10 +25,10 @@ const Product = ({product}) => {
             {
                 basketQuantity 
                     ? (
-                        <div className="d-flex justify-content-between">
-                            <button className="basket-button" onClick={handleAddToBasket}>Add</button>
+                        <div className="d-flex justify-content-between">                            
+                            <button className="basket-button" onClick={handleRemoveToBasket}>-</button>
                             <span className="m-2">{basketQuantity}</span>
-                            <button className="basket-button" onClick={handleRemoveToBasket}>Remove</button>
+                            <button className="basket-button" onClick={handleAddToBasket}>+</button>
                         </div>
                     )
                     : (
