@@ -1,80 +1,79 @@
-import {authState} from './useAuth';
+import { authState } from "../hooks/useAuth";
 
 const AuthApiUrls = {
-    RefreshUrl: 'https://localhost:11443/Authentication/refresh',
-    AnonymousUrl: 'https://localhost:11443/Authentication/anonymous'
+  RefreshUrl: 'https://localhost:11443/Authentication/refresh',
+  AnonymousUrl: 'https://localhost:11443/Authentication/anonymous'
 };
 
-const useHttpClient = () => {     
-
-  const getAccessToken = async (issuedToken) => {   
-      let result = null; 
-
-      if(authState.token){
-        if(!issuedToken || authState.token !== issuedToken){
-          return authState.token;
-        }
-      }
-      
-      if(authState.refreshToken){    
-        result = await fetch(AuthApiUrls.RefreshUrl, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json' 
-          },
-          body: JSON.stringify({refreshToken: authState.refreshToken})
-        })
-        .then(async r => {
-          if(r.ok){
-            const j = await r.json();
-            authState.signIn(j.token, j.refreshToken, j.userName);
-            return authState.token;
-          }
-          if(r.status === 401){
-            authState.signOut();
-          }
-        }).catch(e => {
-          
-        });
-      }    
-  
-      if(result) return result;    
-  
-      if(authState.anonymousToken){
-        if(authState.anonymousToken === issuedToken){
-          authState.signOutAnonymous();
-        }else{
-          return authState.anonymousToken;        
-        }
-      }
-          
-      result = await fetch(AuthApiUrls.AnonymousUrl)      
-        .then(async r => {
-          if(r.ok){
-            const j = await r.json();
-            authState.signInAnonymous(j.token);
-            return authState.anonymousToken;
-          } 
-        })
-        .catch(e => {
-  
-        });
-  
-      return result;
-    };
-  
-    
-    const getAccessTokenSafe = async (issuedToken) => {
+const useHttpClient = () => { 
+  const getAccessToken = async (issuedToken) => {
       let accessToken;
 
+      const get = async (issuedToken) => {   
+          let result = null; 
+          
+          if(authState.token){
+              if(!issuedToken || authState.token !== issuedToken){
+                  return authState.token;
+              }
+          }
+          
+          if(authState.refreshToken){    
+              result = await fetch(AuthApiUrls.RefreshUrl, {
+                  method: 'POST',
+                  headers: { 
+                  'Content-Type': 'application/json' 
+                  },
+                  body: JSON.stringify({refreshToken: authState.refreshToken})
+              })
+              .then(async r => {
+                  if(r.ok){
+                      const j = await r.json();
+                      authState.signIn(j.token, j.refreshToken, j.userName);
+                      return authState.token;
+                  }
+                  if(r.status === 401){
+                      authState.signOut();
+                  }
+              }).catch(e => {
+                  
+              });
+          }    
+      
+          if(result) return result;    
+      
+          if(authState.anonymousToken){
+              if(authState.anonymousToken === issuedToken){
+                  authState.signOutAnonymous();
+              }else{
+                  return authState.anonymousToken;        
+              }
+          }
+              
+          result = await fetch(AuthApiUrls.AnonymousUrl)      
+          .then(async r => {
+              if(r.ok){
+                  const j = await r.json();
+                  authState.signInAnonymous(j.token);
+                  return authState.anonymousToken;
+              } 
+          })
+          .catch(e => {
+              //TODO
+          });
+      
+          return result;
+      };
+
+
       await navigator.locks.request('REFRESH_TOKEN', async lock => {          
-        accessToken = await getAccessToken(issuedToken);
+          accessToken = await get(issuedToken);
       });
 
       return accessToken;
     };
-        
-    
+  
+
     const getData = async (url, requestOptions) => {
       return new Promise(async (resolve, reject) => {
         let token; 
@@ -86,7 +85,7 @@ const useHttpClient = () => {
           result = null;
           error = null;
 
-          token = await getAccessTokenSafe(token);
+          token = await getAccessToken(token);
         
           await fetch(url, {
             ...requestOptions,            

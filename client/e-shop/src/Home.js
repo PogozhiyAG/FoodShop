@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Product from "./components/Product";
 import useHttpClient from "./hooks/useHttpClient";
-import useAuth from "./hooks/useAuth";
 import useBasketContext from "./hooks/useContextBasket";
+import useAuth from "./hooks/useAuth";
+import { authState } from "./hooks/useAuth";
 
 
 const Home = () => {
@@ -14,7 +15,7 @@ const Home = () => {
   const authSync = useAuth();
   const {getData} = useHttpClient();
 
-  const getUserDisplayName = () => authSync.startsWith('ANONYMOUS_') ? 'Anonymous' : authSync;
+  const getUserDisplayName = () => authState.userName ? 'Logged in' : 'Anonymous';
 
   const getDataUrl = () => {
     let url = 'https://localhost:10443/Catalog?';

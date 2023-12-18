@@ -24,7 +24,7 @@ const useBasket = () => {
     const getPosition = (productId) => {
         return positions.find(p => p.id == productId);
     };
-
+    
     return {
         positions,
         addToBasket,

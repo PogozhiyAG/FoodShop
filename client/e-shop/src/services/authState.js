@@ -69,7 +69,7 @@ const AuthState = function () {
     }
 
     
-    this.getSnapshot = () => this.userName ?? 'ANONYMOUS_' + this.anonymousToken;
+    this.getSnapshot = () => this.userName ?? this.anonymousToken;
     
     this.emitChange = () => { 
         for (let listener of this.listeners) {
