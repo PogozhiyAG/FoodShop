@@ -90,3 +90,7 @@
     padding: 6px;
     min-width: 80px;
 }
+
+.basket-added-product{
+  background-color: rgb(238, 250, 238);
+}
