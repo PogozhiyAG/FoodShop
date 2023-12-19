@@ -5,7 +5,7 @@ const useBasket = () => {
     const [positions, setPositions] = useState([]);    
     const {getData} = useHttpClient();
 
-    const reloadBasket = () => {
+    const reload = () => {
         getData( 'https://localhost:13443/Basket')
         .then(r => r.json())
         .then(r => {
@@ -28,7 +28,7 @@ const useBasket = () => {
     return {
         positions,
         addToBasket,
-        reloadBasket,
+        reload,
         getTotalAmount,
         getPosition
     }

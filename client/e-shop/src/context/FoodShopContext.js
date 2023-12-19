@@ -10,7 +10,7 @@ export const FoodShopProvider = ({children}) => {
     const basket = useBasket();
 
     useEffect(() => {
-        basket.reloadBasket()
+        basket.reload()
       }, [authSync]);
 
     const value = {
