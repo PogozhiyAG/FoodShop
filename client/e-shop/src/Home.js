@@ -51,20 +51,32 @@ const Home = () => {
 
 
       <main className="container">
-        <section className="section">
+        <section className="">
           <img src="banner.jpg" className="banner-image"/>
         </section>
 
-        <section className="row section">
-          <a href="#" className="category-galery-item category-galery-item-one p-5 col-md-6 col-sm-12">Drinks</a>
-          <a href="#" className="category-galery-item category-galery-item-two p-5 col-md-6 col-sm-12">Meat</a>
-          <a href="#" className="category-galery-item category-galery-item-three p-5 col-md-2 col-sm-12">Vegitables</a>
-          <a href="#" className="category-galery-item category-galery-item-two p-5 col-md-2 col-sm-12">Fruit</a>
-          <a href="#" className="category-galery-item category-galery-item-three p-5 col-md-4 col-sm-12">Sweets</a>
-          <a href="#" className="category-galery-item category-galery-item-one p-5 col-md-4 col-sm-12">Take away</a>
+        <section className="row g-0">          
+          <a href="#" className="  col-md-2 col-sm-12">
+             <span className="p-4 category-galery-item category-galery-item-three">Meat</span>
+          </a>
+          <a href="#" className=" col-md-2 col-sm-12">
+            <span className="p-4 category-galery-item category-galery-item-two">Meat</span>
+          </a>
+          <a href="#" className="  col-md-4 col-sm-12">
+            <span className="p-4 category-galery-item category-galery-item-three">Meat</span>
+          </a>
+          <a href="#" className="  col-md-4 col-sm-12">
+            <span className="p-4 category-galery-item category-galery-item-one">Meat</span>
+          </a>
+          <a href="#" className="  col-md-6 col-sm-12">
+            <span className="p-5 category-galery-item category-galery-item-one">Drinks</span>
+          </a>
+          <a href="#" className="  col-md-6 col-sm-12">
+            <span className="p-5 category-galery-item category-galery-item-two">Meat</span>
+          </a>
         </section>
 
-        <section className="section">
+        <section className="">
           <div className="d-flex gap-3">
             <Link to="/tag/1">Christmas</Link>
             <Link to="/tag/2">Health</Link>
@@ -73,7 +85,7 @@ const Home = () => {
           </div>
         </section>
         
-        <section className="section">
+        <section className="">
           <div>
             <input className="search-input" value={searchText} onChange={e => setSearchText(e.target.value)}></input>
             <select className="pull-right" value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
@@ -86,7 +98,7 @@ const Home = () => {
 
         
 
-        <section className="row section mt-3 g-3">
+        <section className="row mt-3 g-3">
           {products.map(product => <Product key={product.id} product={product}/>)}
         </section>
       </main>
