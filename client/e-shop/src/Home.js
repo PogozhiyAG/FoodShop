@@ -86,7 +86,7 @@ const Home = () => {
 
         
 
-        <section className="row section mt-3 g-3 justify-content-between">
+        <section className="row section mt-3 g-3">
           {products.map(product => <Product key={product.id} product={product}/>)}
         </section>
       </main>
