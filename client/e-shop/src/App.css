@@ -37,8 +37,6 @@
 
 .product-item{  
   min-height: 25rem;
-  min-width: 200px;
-  max-width: 250px;
   display: flex;
   flex-direction: column;  
 }
@@ -69,10 +67,6 @@
 
 
 
-.row{
-  margin-left: 0;
-  margin-right: 0;
-}
 
 
 
