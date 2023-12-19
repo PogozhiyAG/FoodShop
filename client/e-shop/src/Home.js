@@ -12,7 +12,7 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
-  const authSync = useAuth();
+  
   const {getData} = useHttpClient();
 
   const getUserDisplayName = () => authState.userName ? 'Logged in' : 'Anonymous';
@@ -24,9 +24,7 @@ const Home = () => {
     return url;
   }
 
-  useEffect(() => {
-    basket.reloadBasket()
-  }, [authSync]);
+  
 
 
   useEffect(() => {

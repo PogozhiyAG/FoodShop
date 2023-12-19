@@ -1,13 +1,8 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useBasketContext from "./hooks/useContextBasket";
 
 const Basket = () => {
     const basket = useBasketContext();
-    
-    useEffect(() => {
-        basket.reloadBasket();
-    }, []);
 
     return (
         <>
