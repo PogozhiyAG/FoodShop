@@ -13,7 +13,9 @@ const Product = ({product}) => {
         basket.addToBasket(product.id, -1);
     }
 
-    const basketQuantity = basket.getPosition(product.id)?.quantity;    
+    const basketQuantity = basket.getPosition(product.id)?.quantity;  
+    
+    const imageSrc = `food${product.id % 10}.jpg`;
 
     return(
         <div className="col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-12 product-item-outer">            
@@ -22,7 +24,7 @@ const Product = ({product}) => {
 
                 </div>
                 <Link>
-                    <img src="food.jpg" className="product-image"/>
+                    <img src={imageSrc} className="product-image"/>
                 </Link>
                 <div className="product-item-info p-3">
                     <div className="product-item-description fw-500">

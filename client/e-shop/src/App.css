@@ -1,6 +1,6 @@
-body{
+/* body{
   background-color: #eee;
-}
+} */
 
 a {
   color: inherit;
@@ -56,7 +56,7 @@ a:hover{
 }
 
 .product-item-inner{  
-  background-color: #fefefe;  
+  background-color: #fcfcfc;  
   display: flex;
   flex-direction: column; 
   flex-grow: 1;
