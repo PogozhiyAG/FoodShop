@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import useAuth, { authState } from "./hooks/useAuth";
+import useAuth from "./hooks/useAuth";
 
+
+let COUNTER = 0;
 
 const Login = () => {    
     const [userName, setUserName] = useState();
     const [password, setPassword] = useState();
-    const authSync = useAuth();
+    const auth = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,7 +21,7 @@ const Login = () => {
         .then(async r => {
             if(r.ok){
                 const j = await r.json();                
-                authState.signIn(j.token, j.refreshToken, j.userName);
+                auth.state.signIn(j.token, j.refreshToken, j.userName);
                 return;
             } else if(r.status == 401){
                 return Promise.reject(new Error('Login or password is incorrect'));    
@@ -31,7 +33,7 @@ const Login = () => {
 
     return (
         <>
-            <h1>Category</h1>
+            <h1>Category {COUNTER++}</h1>
             <Link to="/">Home</Link>
 
             <form onSubmit={handleSubmit}>
@@ -41,10 +43,10 @@ const Login = () => {
             </form>
 
             <hr/>
-            <div>{JSON.stringify(authSync)}</div>           
+            <div>{JSON.stringify(auth.sync)}</div>           
 
             <hr/>
-            <button onClick={() => authState.signOut()}>Sign out</button>
+            <button onClick={() => auth.state.signOut()}>Sign out</button>
         </>
     );
 };

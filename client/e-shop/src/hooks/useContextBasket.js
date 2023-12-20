@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import FoodShopContext from "../context/FoodShopContext";
+import { BasketContext } from "../context/BasketContext";
 
 const useBasketContext = () => {
-    const {basket} = useContext(FoodShopContext);
+    const basket = useContext(BasketContext);
     return basket;
 };
 

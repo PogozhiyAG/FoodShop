@@ -1,11 +1,9 @@
-import { useSyncExternalStore } from "react";
-import AuthState from "../services/authState";
-
-export const authState = new AuthState();
+import {useContext} from 'react';
+import {AuthContext} from '../context/AuthContext'
 
 const useAuth = () => {
-    const authSync = useSyncExternalStore(authState.subscribe, authState.getSnapshot);
-    return authSync;
+    const auth = useContext(AuthContext);
+    return auth;
 }
 
 export default useAuth;

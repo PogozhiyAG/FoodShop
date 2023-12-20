@@ -4,18 +4,21 @@ import Product from "./components/Product";
 import useHttpClient from "./hooks/useHttpClient";
 import useBasketContext from "./hooks/useContextBasket";
 import useAuth from "./hooks/useAuth";
-import { authState } from "./hooks/useAuth";
 
 
 const Home = () => {
   const basket = useBasketContext();
+  const auth = useAuth();
+
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
   
   const {getData} = useHttpClient();
 
-  const getUserDisplayName = () => authState.userName ? 'Logged in' : 'Anonymous';
+
+
+  const getUserDisplayName = () => auth.state.userName ? 'Logged in' : 'Anonymous';
 
   const getDataUrl = () => {
     let url = 'https://localhost:10443/Catalog?';

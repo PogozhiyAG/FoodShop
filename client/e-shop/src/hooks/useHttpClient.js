@@ -1,12 +1,17 @@
-import { authState } from "../hooks/useAuth";
+import useAuth from "./useAuth";
+
 
 const AuthApiUrls = {
   RefreshUrl: 'https://localhost:11443/Authentication/refresh',
   AnonymousUrl: 'https://localhost:11443/Authentication/anonymous'
 };
 
-const useHttpClient = () => { 
+const useHttpClient = () => {   
+  const authState = useAuth().state;
+
   const getAccessToken = async (issuedToken) => {
+      
+
       let accessToken;
 
       const get = async (issuedToken) => {   
