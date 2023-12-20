@@ -21,25 +21,27 @@ const Product = ({product}) => {
                 <div className="product-item-header">
 
                 </div>
-                <img src="food.jpg" className="product-image"/>
+                <Link>
+                    <img src="food.jpg" className="product-image"/>
+                </Link>
                 <div className="product-item-info p-3">
                     <div className="product-item-description fw-500">
                         <Link>{product.name}</Link>
                     </div>
                     
-                    <div className="product-item-price fs-4 mb-2">£{product.price.toFixed(2)}</div>
+                    <div className="product-item-price fs-4 mb-2 fw-500">£{product.price.toFixed(2)}</div>
                     
                     {
                         basketQuantity 
                             ? (
-                                <div className="d-flex justify-content-between">                            
+                                <div className="d-flex justify-content-between fs-5 fw-500">                            
                                     <button className="basket-button" onClick={handleRemoveToBasket}>-</button>
-                                    <span className="m-2">{basketQuantity}</span>
+                                    <span className="mx-2 pt-1">{basketQuantity}</span>
                                     <button className="basket-button" onClick={handleAddToBasket}>+</button>
                                 </div>
                             )
                             : (
-                                <div className="d-flex justify-content-between">
+                                <div className="d-flex justify-content-between fs-5 fw-500">
                                     <button className="basket-button w-100" onClick={handleAddToBasket}>Add</button>
                                 </div>
                             )

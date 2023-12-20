@@ -2,7 +2,7 @@
 
 public enum ProductSortType
 {
-    Price,
     Popularity,
+    Price,
     CustomerRank
 }
