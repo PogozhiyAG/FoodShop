@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
 import useBasketContext from "./hooks/useContextBasket";
+import useAuth from "./hooks/useAuth";
 
 const Basket = () => {
     const basket = useBasketContext();
+    const auth = useAuth();
+
+    const getUserDisplayName = () => auth.state.userName ? 'Logged in' : 'Anonymous';
 
     const handleAddToBasket = (product) => {
         basket.add(product.id, 1);
@@ -25,7 +29,8 @@ const Basket = () => {
             <header className="header">
                 <img src="logo.png" style={{width: '50px', height: '50px'}}/>
                 <Link className="p-2" to="/">Home</Link>
-                <Link className="p-2" to="/login">Login</Link>                
+                <Link className="p-2" to="/login">Login</Link> 
+                <span className="p-2">{getUserDisplayName()}</span>               
             </header>
             <main className="container">
                 <h1>Basket</h1>
