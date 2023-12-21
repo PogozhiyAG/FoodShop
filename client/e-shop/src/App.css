@@ -1,5 +1,5 @@
 /* body{
-  background-color: #eee;
+  background-color: #fafafa;
 } */
 
 a {
@@ -50,18 +50,17 @@ a:hover{
 
 
 
-.product-item-outer{    
+.product-item-outer{      
   display: flex;
   flex-direction: column;   
 }
 
-.product-item-inner{  
-  background-color: #fcfcfc;  
+.product-item-inner{     
   display: flex;
   flex-direction: column; 
   flex-grow: 1;
   min-height: 32rem;
-  border: #f5f5f5 solid 2px; 
+  border: #f5f5f5 solid 2px;   
 }
 
 .product-item-header{

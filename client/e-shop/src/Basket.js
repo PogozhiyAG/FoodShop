@@ -17,9 +17,11 @@ const Basket = () => {
                     <table>
                         <tbody>
                             {basket.positions?.map((product, i) => {
+                                const imageSrc = `food${product.id % 10}.jpg`;
+
                                 return (
                                     <tr key={i} className="basket-product-row">
-                                        <td><img src="food.jpg" className="basket-product-image"/></td>
+                                        <td><img src={imageSrc} className="basket-product-image"/></td>
                                         <td>{product.name}</td>
                                         <td>{product.basePrice}</td>
                                         <td>{product.quantity}</td>
