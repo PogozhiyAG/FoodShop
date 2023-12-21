@@ -116,8 +116,8 @@ a:hover{
 .basket-button{
     border: none;
     border-radius: 6px;
-    padding: 6px;
-    min-width: 50px;
+    padding: 0.2rem 0 0.5rem 0;
+    min-width: 40px;
     background-color:#bf1b93;
     color: #ebe1e9;
     font-weight: 700;

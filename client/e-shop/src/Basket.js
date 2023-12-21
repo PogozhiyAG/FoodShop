@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import useBasketContext from "./hooks/useContextBasket";
 import useAuth from "./hooks/useAuth";
+import PlusMinus from "./components/PlusMinus";
 
 const Basket = () => {
     const basket = useBasketContext();
@@ -19,11 +20,7 @@ const Basket = () => {
     const handleRemoveProduct = (product) => {
         basket.set(product.id, 0);
     }
-
-    const handleClear = () => {
-        basket.clear();
-    }
-
+    
     return (
         <>
             <header className="header">
@@ -37,7 +34,7 @@ const Basket = () => {
                 
                 <section className="row section"> 
                     <div className="d-flex">                        
-                        <span className="h2">{basket.getTotalAmount() }</span>
+                        <span className="h2">£{basket.getTotalAmount() }</span>
                     </div>               
                     <table>
                         <tbody>
@@ -47,14 +44,16 @@ const Basket = () => {
                                 return (
                                     <tr key={i} className="basket-product-row">
                                         <td><img src={imageSrc} className="basket-product-image"/></td>
-                                        <td>{product.name}</td>                                        
+                                        <td >{product.name}</td>                                        
                                         <td>{product.basePrice}</td>
-                                        <td>
-                                            <button  onClick={() => handleRemoveFromBasket(product)}>-</button>
-                                            <span>{product.quantity}</span>
-                                            <button  onClick={() => handleAddToBasket(product)}>+</button>
-                                        </td>
-                                        <td>{product.offerAmount} ({product.baseAmount})</td>
+                                        <td >
+                                            <PlusMinus 
+                                                onPlus={() => handleRemoveFromBasket(product)} 
+                                                onMinus={() => handleAddToBasket(product)}
+                                                value={product.quantity}
+                                            />
+                                        </td>                                        
+                                        <td className="text-end fs-5 fw-500">£{product.offerAmount}</td>
                                         <td><button onClick={() => handleRemoveProduct(product)}>X</button></td>
                                     </tr>                       
                                 );
