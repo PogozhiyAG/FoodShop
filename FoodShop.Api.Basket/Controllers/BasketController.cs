@@ -67,6 +67,15 @@ public class BasketController : ControllerBase
     }
 
 
+    [HttpPost("clear")]
+    public async Task<IActionResult> Clear()
+    {
+        var key = GetBasketCacheKey();
+        await _cache.RemoveAsync(key);
+        return Ok();
+    }
+
+
     private async Task<CustomerBasket> EnsureBasket()
     {
         var key = GetBasketCacheKey();

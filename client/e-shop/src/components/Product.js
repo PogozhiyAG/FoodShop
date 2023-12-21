@@ -6,11 +6,11 @@ const Product = ({product}) => {
     const basket = useBasketContext();
 
     const handleAddToBasket = () => {
-        basket.addToBasket(product.id, 1);
+        basket.add(product.id, 1);
     }
 
-    const handleRemoveToBasket = () => {
-        basket.addToBasket(product.id, -1);
+    const handleRemoveFromBasket = () => {
+        basket.add(product.id, -1);
     }
 
     const basketQuantity = basket.getPosition(product.id)?.quantity;  
@@ -37,7 +37,7 @@ const Product = ({product}) => {
                         basketQuantity 
                             ? (
                                 <div className="d-flex justify-content-between fs-5 fw-500">                            
-                                    <button className="basket-button" onClick={handleRemoveToBasket}>-</button>
+                                    <button className="basket-button" onClick={handleRemoveFromBasket}>-</button>
                                     <span className="mx-2 pt-1">{basketQuantity}</span>
                                     <button className="basket-button" onClick={handleAddToBasket}>+</button>
                                 </div>
