@@ -30,37 +30,53 @@ const Basket = () => {
                 <span className="p-2">{getUserDisplayName()}</span>               
             </header>
             <main className="container">
-                <h1>Basket</h1>
+                <h1 className="mb-5">Basket</h1>                
                 
-                <section className="row section"> 
-                    <div className="d-flex">                        
-                        <span className="h2">£{basket.getTotalAmount() }</span>
-                    </div>               
-                    <table>
-                        <tbody>
-                            {basket.positions?.map((product, i) => {
-                                const imageSrc = `food${product.id % 10}.jpg`;
 
-                                return (
-                                    <tr key={i} className="basket-product-row">
-                                        <td><img src={imageSrc} className="basket-product-image"/></td>
-                                        <td >{product.name}</td>                                        
-                                        <td>{product.basePrice}</td>
-                                        <td >
-                                            <PlusMinus 
-                                                onPlus={() => handleRemoveFromBasket(product)} 
-                                                onMinus={() => handleAddToBasket(product)}
-                                                value={product.quantity}
-                                            />
-                                        </td>                                        
-                                        <td className="text-end fs-5 fw-500">£{product.offerAmount}</td>
-                                        <td><button onClick={() => handleRemoveProduct(product)}>X</button></td>
-                                    </tr>                       
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </section>
+                {basket.positions.map(product => {
+                    const imageSrc = `food${product.id % 10}.jpg`;
+                    
+                    return( 
+                        <section className="row border-bottom py-2">
+                            <div className="col-md-1">
+                                <img src={imageSrc} className="basket-product-image"/>    
+                            </div>
+                            <div className="col-md-6">
+                                <Link>{product.name}</Link>
+                            </div>
+                            <div className="col-md-1 text-end fs-5">
+                                £{product.basePrice}
+                            </div>
+                            <div className="col-md-2">
+                                <PlusMinus 
+                                    onMinus={() => handleRemoveFromBasket(product)} 
+                                    onPlus={() => handleAddToBasket(product)}
+                                    value={product.quantity}
+                                />
+                            </div>
+                            <div className="col-md-1 text-end fs-5">
+                                £{product.offerAmount}
+                            </div>
+                            <div className="col-md-1">
+                                <button className="button-light" onClick={() => handleRemoveProduct(product)}>
+                                    X
+                                </button>
+                            </div>
+                        </section>
+                    );
+                })}
+
+
+                <div className="row">
+                    <div className="col-md-11 d-flex flex-row-reverse">
+                        <span className="fs-2">£{basket.getTotalAmount() }</span>
+                    </div>                    
+                </div> 
+                <div className="row mt-3">
+                    <div className="col-md-11 d-flex flex-row-reverse">
+                        <button className="basket-button px-5">Checkout</button>
+                    </div>                    
+                </div> 
             </main>
         </>
     );

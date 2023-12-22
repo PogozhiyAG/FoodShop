@@ -130,3 +130,12 @@ a:hover{
   background-color: rgb(238, 250, 238);
   /* border: rgb(238, 250, 238) solid 2px; */
 }
+
+.button-light{
+  border: none;
+  background-color: transparent;  
+  padding: 0.2rem 0 0.5rem 0;
+  font-weight: 700;
+  color: #aaa;
+}
+
