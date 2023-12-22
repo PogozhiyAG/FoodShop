@@ -172,13 +172,4 @@ public class AuthenticationController : ControllerBase
         generator.GetBytes(array);
         return Convert.ToBase64String(array);
     }
-
-
-    private ClaimsPrincipal GetPrincipalFromToken(string token)
-    {
-        var validationParameters = _jwtBearerOptions.Value.TokenValidationParameters.Clone();
-        validationParameters.ValidateLifetime = false;
-
-        return new JwtSecurityTokenHandler().ValidateToken(token, validationParameters, out _);
-    }
 }
