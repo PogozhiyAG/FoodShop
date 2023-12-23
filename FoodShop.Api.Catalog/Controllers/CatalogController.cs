@@ -1,10 +1,12 @@
 ﻿using FoodShop.Api.Catalog.Model;
 using FoodShop.Api.Catalog.Services;
 using FoodShop.Infrastructure.Data;
+using FoodShop.Api.Catalog.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using FoodShop.Core.Models;
 
 namespace FoodShop.Api.Catalog.Controllers;
 
@@ -86,46 +88,19 @@ public class CatalogController : ControllerBase
             take = 50;
         }
 
-        q = q
+        var result = q
             .Skip(skip.Value)
             .Take(take.Value)
-            .Include(p => p.Tags).ThenInclude(t => t.Tag)
-            .Include(p => p.Brand)
-            .Include(p => p.Category);
+            .IncludeProductRefProperties()
+            .Select(p => p.MapToOfferedProductDto(
+                _priceStrategyProvider.GetStrategyLink(p, tokenTypes)
+             ))
+            .ToList();
 
-        return Ok(
-            q.Select(p => new
-            {
-                Product = p,
-                OfferLink = _priceStrategyProvider.GetStrategyLink(p, tokenTypes)
-            })
-            .ToList()
-            .Select(p =>
-                new
-                {
-                    p.Product.Id,
-                    p.Product.Name,
-                    p.Product.Description,
-                    Brand = new
-                    {
-                        p.Product.Brand?.Id,
-                        p.Product.Brand?.Name
-                    },
-                    Category = new
-                    {
-                        p.Product.Category?.Id,
-                        p.Product.Category?.Name
-                    },
-                    p.Product.Price,
-                    p.Product.Popularity,
-                    p.Product.CustomerRating,
-                    //TODO
-                    p.OfferLink,
-                    OfferPrice = p.OfferLink.ProductPriceStrategy.GetAmount(p.Product.Price, 1)
-                }
-            )
-        );
+        return Ok(result);
     }
+
+
 
     [HttpGet("calculate")]
     public async Task<IActionResult> Calculate([FromBody] CalculateRequest request)
@@ -135,51 +110,22 @@ public class CatalogController : ControllerBase
         var productIds = request.Items.Keys.Select(k => int.Parse(k)).ToList();
 
         var q = db.Products.AsNoTracking()
-            .Include(p => p.Tags).ThenInclude(t => t.Tag)
-            .Include(p => p.Brand)
-            .Include(p => p.Category)
+            .IncludeProductRefProperties()
             .Where(p => productIds.Contains(p.Id))
-            .Select(p => new
-            {
-                Product = p,
-                Quantity = request.Items[p.Id.ToString()],
-                OfferLink = _priceStrategyProvider.GetStrategyLink(p, tokenTypes)
-            })
-            .ToList()
-            .Select(p =>
-                new
-                {
-                    p.Product.Id,
-                    p.Product.Name,
-                    p.Product.Description,
-                    Brand = new
-                    {
-                        p.Product.Brand?.Id,
-                        p.Product.Brand?.Name
-                    },
-                    Category = new
-                    {
-                        p.Product.Category?.Id,
-                        p.Product.Category?.Name
-                    },
-                    p.Product.Popularity,
-                    p.Product.CustomerRating,
-
-                    p.OfferLink,
-                    p.Quantity,
-                    BasePrice = p.Product.Price,
-                    BaseAmount = p.Quantity * p.Product.Price,
-                    OfferAmount = p.OfferLink.ProductPriceStrategy.GetAmount(p.Product.Price, p.Quantity)
-                }
-            );
+            .Select(p => p.MapToOfferedProductBatchDto(
+                _priceStrategyProvider.GetStrategyLink(p, tokenTypes),
+                request.Items[p.Id.ToString()]
+             ))
+            .ToList();
 
         return Ok(q);
     }
 
 
+
     private async Task<IEnumerable<string>> GetTokenTypes()
     {
-        var principal = _httpContextAccessor.HttpContext.User;
+        var principal = _httpContextAccessor.HttpContext!.User;
         var isAnonymous = principal.Claims.Any(c => c.Type == ClaimTypes.Anonymous);
         if (isAnonymous)
         {
@@ -194,4 +140,13 @@ public class CatalogController : ControllerBase
         text = text.Replace("~", " ");
         return string.Join(" ~ ", text.Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(w => $"\"{w}*\""));
     }
+}
+
+
+public static class ProductQueryExtensions
+{
+    public static IQueryable<Product> IncludeProductRefProperties(this IQueryable<Product> products) => products
+            .Include(p => p.Tags).ThenInclude(t => t.Tag)
+            .Include(p => p.Brand)
+            .Include(p => p.Category);
 }

@@ -14,6 +14,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 {
     private readonly IDbContextFactory<FoodShopDbContext> _dbContextFactory;
     private readonly IMemoryCache _cache;
+    private readonly ReaderWriterLockSlim _cacheLock = new ReaderWriterLockSlim();
 
     public ProductPriceStrategyProvider(IDbContextFactory<FoodShopDbContext> dbContextFactory, IMemoryCache cache)
     {
@@ -48,23 +49,48 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
     private Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink> GetStrategies()
     {
-        if (_cache.TryGetValue(nameof(GetStrategies), out Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink>? value))
+        _cacheLock.EnterUpgradeableReadLock();
+        try
         {
-            return value!;
+            if (_cache.TryGetValue(nameof(GetStrategies), out Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink>? value))
+            {
+                return value!;
+            }
+            else
+            {
+                _cacheLock.EnterWriteLock();
+                try
+                {
+                    if (_cache.TryGetValue(nameof(GetStrategies), out value))
+                    {
+                        return value!;
+                    }
+                    else
+                    {
+                        using var db = _dbContextFactory.CreateDbContext();
+
+                        value = db.ProductPriceStrategyLinks.AsNoTracking()
+                            .Include(s => s.ProductPriceStrategy)
+                            .ToDictionary(s => new ValueTuple<string?, EntityTypeCode, int>(s.TokenTypeCode, s.ReferenceType, s.ReferenceId));
+
+                        _cache.Set(nameof(GetStrategies), value, new MemoryCacheEntryOptions()
+                        {
+                            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
+                        });
+
+                        return value;
+                    }
+                }
+                finally
+                {
+                    _cacheLock.ExitWriteLock();
+                }
+            }
         }
-
-        using var db = _dbContextFactory.CreateDbContext();
-
-        var result = db.ProductPriceStrategyLinks.AsNoTracking()
-            .Include(s => s.ProductPriceStrategy)
-            .ToDictionary(s => new ValueTuple<string?, EntityTypeCode, int>(s.TokenTypeCode, s.ReferenceType, s.ReferenceId));
-
-        _cache.Set(nameof(GetStrategies), result, new MemoryCacheEntryOptions()
+        finally
         {
-            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
-        });
-
-        return result;
+            _cacheLock.ExitUpgradeableReadLock();
+        }
     }
 
     private IEnumerable<ValueTuple<EntityTypeCode, int>> GetReferencesFromProduct(Product product)

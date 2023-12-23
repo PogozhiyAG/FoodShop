@@ -27,7 +27,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddDbContextFactory<FoodShopDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IProductPriceStrategyProvider, ProductPriceStrategyProvider>();
+builder.Services.AddSingleton<IProductPriceStrategyProvider, ProductPriceStrategyProvider>();
 builder.Services.AddScoped<ICustomerProfile, CustomerProfile>();
 
 
