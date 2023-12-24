@@ -48,7 +48,7 @@ public class CatalogController : ControllerBase
 
         using var db = await _dbContextFactory.CreateDbContextAsync();
 
-        var q = db.Products.AsNoTracking();
+        var q = db.Products.SetupProductQuery();
 
         if (!string.IsNullOrEmpty(text))
         {
@@ -91,7 +91,6 @@ public class CatalogController : ControllerBase
         var result = q
             .Skip(skip.Value)
             .Take(take.Value)
-            .IncludeProductRefProperties()
             .Select(p => p.MapToOfferedProductDto(
                 _priceStrategyProvider.GetStrategyLink(p, tokenTypes)
              ))
@@ -106,11 +105,13 @@ public class CatalogController : ControllerBase
     public async Task<IActionResult> Calculate([FromBody] CalculateRequest request)
     {
         var tokenTypes = await GetTokenTypes();
+
         using var db = await _dbContextFactory.CreateDbContextAsync();
+
         var productIds = request.Items.Keys.Select(k => int.Parse(k)).ToList();
 
-        var q = db.Products.AsNoTracking()
-            .IncludeProductRefProperties()
+        var q = db.Products
+            .SetupProductQuery()
             .Where(p => productIds.Contains(p.Id))
             .Select(p => p.MapToOfferedProductBatchDto(
                 _priceStrategyProvider.GetStrategyLink(p, tokenTypes),
@@ -145,8 +146,9 @@ public class CatalogController : ControllerBase
 
 public static class ProductQueryExtensions
 {
-    public static IQueryable<Product> IncludeProductRefProperties(this IQueryable<Product> products) => products
-            .Include(p => p.Tags).ThenInclude(t => t.Tag)
-            .Include(p => p.Brand)
-            .Include(p => p.Category);
+    public static IQueryable<Product> SetupProductQuery(this IQueryable<Product> products) => products
+        .AsNoTracking()
+        .Include(p => p.Tags).ThenInclude(t => t.Tag)
+        .Include(p => p.Brand)
+        .Include(p => p.Category);
 }
