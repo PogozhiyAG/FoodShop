@@ -1,6 +1,16 @@
 version: '3.4'
 
 services:
+  foodshop.api.order:
+    image: ${DOCKER_REGISTRY-}foodshopapiorder
+    build:
+      context: .
+      dockerfile: FoodShop.Api.Order/Dockerfile
+    ports:
+      - "14080:80"
+      - "14443:443"
+    networks:
+      - foodshopnetwork
   foodshop.api.basket:
     image: ${DOCKER_REGISTRY-}foodshopapibasket
     build:
