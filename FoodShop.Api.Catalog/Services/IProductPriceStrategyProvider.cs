@@ -14,7 +14,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 {
     private readonly IDbContextFactory<FoodShopDbContext> _dbContextFactory;
     private readonly IMemoryCache _cache;
-    private readonly ReaderWriterLockSlim _cacheLock = new ReaderWriterLockSlim();
+    private readonly SemaphoreSlim _cacheLock = new SemaphoreSlim(1, 1);
 
     public ProductPriceStrategyProvider(IDbContextFactory<FoodShopDbContext> dbContextFactory, IMemoryCache cache)
     {
@@ -49,47 +49,40 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
     private Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink> GetStrategies()
     {
-        _cacheLock.EnterUpgradeableReadLock();
-        try
+        if (_cache.TryGetValue(nameof(GetStrategies), out Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink>? value))
         {
-            if (_cache.TryGetValue(nameof(GetStrategies), out Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink>? value))
-            {
-                return value!;
-            }
-            else
-            {
-                _cacheLock.EnterWriteLock();
-                try
-                {
-                    if (_cache.TryGetValue(nameof(GetStrategies), out value))
-                    {
-                        return value!;
-                    }
-                    else
-                    {
-                        using var db = _dbContextFactory.CreateDbContext();
-
-                        value = db.ProductPriceStrategyLinks.AsNoTracking()
-                            .Include(s => s.ProductPriceStrategy)
-                            .ToDictionary(s => new ValueTuple<string?, EntityTypeCode, int>(s.TokenTypeCode, s.ReferenceType, s.ReferenceId));
-
-                        _cache.Set(nameof(GetStrategies), value, new MemoryCacheEntryOptions()
-                        {
-                            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
-                        });
-
-                        return value;
-                    }
-                }
-                finally
-                {
-                    _cacheLock.ExitWriteLock();
-                }
-            }
+            return value!;
         }
-        finally
+        else
         {
-            _cacheLock.ExitUpgradeableReadLock();
+            try
+            {
+                _cacheLock.Wait();
+
+                if (_cache.TryGetValue(nameof(GetStrategies), out value))
+                {
+                    return value!;
+                }
+                else
+                {
+                    using var db = _dbContextFactory.CreateDbContext();
+
+                    value = db.ProductPriceStrategyLinks.AsNoTracking()
+                        .Include(s => s.ProductPriceStrategy)
+                        .ToDictionary(s => new ValueTuple<string?, EntityTypeCode, int>(s.TokenTypeCode, s.ReferenceType, s.ReferenceId));
+
+                    _cache.Set(nameof(GetStrategies), value, new MemoryCacheEntryOptions()
+                    {
+                        AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
+                    });
+
+                    return value;
+                }
+            }
+            finally
+            {
+                _cacheLock.Release();
+            }
         }
     }
 
