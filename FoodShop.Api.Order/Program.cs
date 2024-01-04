@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using FoodShop.Api.Order.Configuration;
+using Microsoft.EntityFrameworkCore;
+using FoodShop.Api.Order.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<OrderDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJWTBearerOptions>();
 builder.Services.AddAuthentication(options =>
@@ -34,4 +37,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+using (var db = app.Services.CreateScope().ServiceProvider.GetRequiredService<OrderDbContext>())
+{
+    db.Database.EnsureCreated();
+}
 app.Run();
