@@ -33,7 +33,8 @@ public static class ProductMappingExtensions
     private static void SetupOfferedProductDto(OfferedProductDto offeredProductDto, Product product, ProductPriceStrategyLink offerLink)
     {
         SetupProductDto(offeredProductDto, product);
-        offeredProductDto.OfferLink = offerLink;
+        offeredProductDto.TokenTypeCode = offerLink.TokenTypeCode;
+        offeredProductDto.StrategyName = offerLink.ProductPriceStrategy.Name;
         offeredProductDto.OfferPrice = offerLink.ProductPriceStrategy.GetAmount(product.Price, 1);
     }
 

@@ -6,6 +6,9 @@
         "serviceActions": {
             "foodshop.api.catalog": "StartDebugging",
             "foodshop.api.auth": "StartDebugging",
+            "foodshop.api.basket": "StartDebugging",
+            "foodshop.api.order": "StartDebugging",
+            "foodshop.api.customerprofile": "StartDebugging",
             "sqldata": "StartWithoutDebugging",
             "basketdata": "StartWithoutDebugging"
         }

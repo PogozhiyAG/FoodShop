@@ -4,6 +4,7 @@ namespace FoodShop.Api.Catalog.Dto;
 
 public class OfferedProductDto : ProductDto
 {
-    public ProductPriceStrategyLink OfferLink { get; set; }
+    public string? TokenTypeCode { get; set; }
+    public string? StrategyName { get; set; }
     public decimal OfferPrice { get; set; }
 }

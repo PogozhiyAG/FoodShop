@@ -8,4 +8,6 @@ public class Order
     public DateTime CreateDate { get; set; } = DateTime.Now;
     public string? Description { get; set; }
     public ICollection<OrderItem> Items { get; set; }
+    public Guid? DeliveryInfoId { get; set; }
+    public DeliveryInfo? DeliveryInfo { get; set; }
 }

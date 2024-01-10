@@ -1,8 +1,8 @@
-﻿namespace FoodShop.Api.Order.Dto
+﻿namespace FoodShop.Api.Order.Dto;
+
+public class CreateOrderRequest
 {
-    public class CreateOrderRequest
-    {
-        public List<OrderItemDto> Items { get; set; } = new();
-        public string? Description { get; set; }
-    }
+    public List<OrderItemDto> Items { get; set; } = [];
+    public DeliveryInfoDto? Delivery { get; set; }
+    public string? Description { get; set; }
 }
