@@ -1,5 +1,5 @@
-﻿using FoodShop.Api.Order.Data;
-using FoodShop.Api.Order.Model;
+﻿using FoodShop.Api.Order.Model;
+using FoodShop.Api.Order.Services.CalculationStage;
 
 namespace FoodShop.Api.Order.Services;
 
@@ -41,45 +41,11 @@ public class OrderCalculator : IOrderCalculator
 
         foreach ( var stageKey in stageKeys )
         {
-            var calculationStage = _serviceProvider.GetRequiredKeyedService<IOrderCalculationStage>(stageKey);
+            var calculationStage = _serviceProvider.GetRequiredKeyedService<IOrderCalculationStage>(stageKey.Trim());
             var calculation = await calculationStage.GetCalculation(context);
             calculationList.AddRange(calculation);
         }
 
         return calculationList;
-    }
-}
-
-
-public interface IOrderCalculationStage
-{
-    Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext);
-}
-
-
-public class ProductCalculationStage : IOrderCalculationStage
-{
-    public const string DEFAULT_SERVICE_KEY = "product";
-    private readonly IProductCatalog _productCatalog;
-
-    public ProductCalculationStage(IProductCatalog productCatalog)
-    {
-        _productCatalog = productCatalog;
-    }
-
-    public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
-    {
-        var order = orderCalculationContext.Order;
-        var calculatedProducts = await _productCatalog.CalculateProducts(order.Items);
-
-        var result = calculatedProducts.Select(p => new OrderCalculation()
-        {
-            Order = order,
-            TypeCode = OrderCalculationTypeCodes.Product,
-            CreateDate = orderCalculationContext.Now,
-            Amount = p.OfferAmount
-        });
-
-        return result;
     }
 }

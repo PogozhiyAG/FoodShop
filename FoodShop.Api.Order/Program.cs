@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Services;
 using Microsoft.Extensions.DependencyInjection;
+using FoodShop.Api.Order.Services.CalculationStage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,8 @@ builder.Services.AddScoped<IProductCatalog, ProductCatalog>();
 builder.Services.AddScoped<IOrderCalculator, OrderCalculator>();
 
 builder.Services.AddKeyedScoped<IOrderCalculationStage, ProductCalculationStage>(ProductCalculationStage.DEFAULT_SERVICE_KEY);
+builder.Services.AddKeyedScoped<IOrderCalculationStage, PackingServiceCalculationStage>(PackingServiceCalculationStage.DEFAULT_SERVICE_KEY);
+builder.Services.AddKeyedScoped<IOrderCalculationStage, DeliveryCalculationStage>(DeliveryCalculationStage.DEFAULT_SERVICE_KEY);
 
 
 
