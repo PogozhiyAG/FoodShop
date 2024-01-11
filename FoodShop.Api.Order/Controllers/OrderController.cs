@@ -1,7 +1,7 @@
 ﻿using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Dto;
 using FoodShop.Api.Order.Model;
-using FoodShop.Api.Order.Services;
+using FoodShop.Api.Order.Services.Calculation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

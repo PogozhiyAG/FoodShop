@@ -1,7 +1,7 @@
 ﻿using FoodShop.Api.Order.Model;
-using FoodShop.Api.Order.Services.CalculationStage;
+using FoodShop.Api.Order.Services.Calculation.Stage;
 
-namespace FoodShop.Api.Order.Services;
+namespace FoodShop.Api.Order.Services.Calculation;
 
 public interface IOrderCalculator
 {
@@ -39,7 +39,7 @@ public class OrderCalculator : IOrderCalculator
 
         var stageKeys = _configuration["OrderCalculator:Stages"].Split(",", StringSplitOptions.RemoveEmptyEntries);
 
-        foreach ( var stageKey in stageKeys )
+        foreach (var stageKey in stageKeys)
         {
             var calculationStage = _serviceProvider.GetRequiredKeyedService<IOrderCalculationStage>(stageKey.Trim());
             var calculation = await calculationStage.GetCalculation(context);

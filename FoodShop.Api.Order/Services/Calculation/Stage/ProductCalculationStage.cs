@@ -1,6 +1,6 @@
 ﻿using FoodShop.Api.Order.Model;
 
-namespace FoodShop.Api.Order.Services.CalculationStage;
+namespace FoodShop.Api.Order.Services.Calculation.Stage;
 
 public class ProductCalculationStage : IOrderCalculationStage
 {
@@ -24,6 +24,9 @@ public class ProductCalculationStage : IOrderCalculationStage
             //TODO: to OrderCalculator level?
             Order = order,
             CreateDate = orderCalculationContext.Now,
+            Properties = new List<OrderCalculationProperty> () {
+                new () {Name = "STRATEGY",Value = p.StrategyName }
+            }
         });
 
         return result;

@@ -1,6 +1,6 @@
 ﻿using FoodShop.Api.Order.Model;
 
-namespace FoodShop.Api.Order.Services.CalculationStage;
+namespace FoodShop.Api.Order.Services.Calculation.Stage;
 
 public class DeliveryCalculationStage : IOrderCalculationStage
 {
@@ -8,7 +8,8 @@ public class DeliveryCalculationStage : IOrderCalculationStage
 
     public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
     {
-        if(orderCalculationContext.Order.DeliveryInfo == null) {
+        if (orderCalculationContext.Order.DeliveryInfo == null)
+        {
             return Array.Empty<OrderCalculation>();
         }
 

@@ -4,8 +4,8 @@ using FoodShop.Api.Order.Configuration;
 using Microsoft.EntityFrameworkCore;
 using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Services;
-using Microsoft.Extensions.DependencyInjection;
-using FoodShop.Api.Order.Services.CalculationStage;
+using FoodShop.Api.Order.Services.Calculation;
+using FoodShop.Api.Order.Services.Calculation.Stage;
 
 var builder = WebApplication.CreateBuilder(args);
 
