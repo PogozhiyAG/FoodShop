@@ -1,12 +1,10 @@
 ﻿using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Dto;
-using FoodShop.Api.Order.Dto.Catalog;
 using FoodShop.Api.Order.Model;
+using FoodShop.Api.Order.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Net.Http.Headers;
-using System.Net.Http;
 
 namespace FoodShop.Api.Order.Controllers;
 
@@ -17,15 +15,13 @@ public class OrderController : ControllerBase
 {
     private readonly OrderDbContext _orderDbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IConfiguration _configuration;
+    private readonly IOrderCalculator _orderCalculator;
 
-    public OrderController(OrderDbContext orderDbContext, IHttpContextAccessor httpContextAccessor, IHttpClientFactory httpClientFactory, IConfiguration configuration)
+    public OrderController(OrderDbContext orderDbContext, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator)
     {
         _orderDbContext = orderDbContext;
         _httpContextAccessor = httpContextAccessor;
-        _httpClientFactory = httpClientFactory;
-        _configuration = configuration;
+        _orderCalculator = orderCalculator;
     }
 
     private string GetUserName() => _httpContextAccessor.HttpContext!.User.Identity!.Name!;
@@ -85,55 +81,15 @@ public class OrderController : ControllerBase
             };
         }
 
-
-        var customerBasket = new ProductBatchCalculationRequest();
-        customerBasket.Items = order.Items.ToDictionary(i => i.ProductId, i => i.Quantity);
-
-        var calculatedProducts = await CalculateProducts(customerBasket);
-
-        foreach (var calculatedProduct in calculatedProducts)
-        {
-            var orderCalculation = new OrderCalculation()
-            {
-                Order = order,
-                TypeCode = OrderCalculationTypeCodes.Product,
-                CreateDate = now,
-                Amount = calculatedProduct.OfferAmount
-            };
-            _orderDbContext.Add(orderCalculation);
-        }
-
         _orderDbContext.Add(order);
+
+        var orderCalculations = (await _orderCalculator.CalculateOrder(order)).ToList();
+        _orderDbContext.AddRange(orderCalculations);
+
         await _orderDbContext.SaveChangesAsync();
 
         //TODO: Created?
         return Ok(order.Id);
     }
-
-    private async Task<List<CalculatedOrderItem>> CalculateProducts(ProductBatchCalculationRequest basket)
-    {
-        var httpClient = _httpClientFactory.CreateClient();
-        var url = _configuration["ApiUrls:FoodShop.Api.Catalog"];
-
-        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url)
-        {
-            Headers =
-            {
-                { HeaderNames.Authorization, Request.Headers.Authorization.FirstOrDefault() }
-            },
-            Content = JsonContent.Create(basket)
-        };
-
-        var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-        var result = await httpResponseMessage.Content.ReadFromJsonAsync<List<CalculatedOrderItem>>();
-
-        return result;
-    }
 }
 
-public class ProductBatchCalculationRequest
-{
-    public Dictionary<string, int> Items { get; set; } = new();
-
-}

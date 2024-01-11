@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using FoodShop.Api.Order.Configuration;
 using Microsoft.EntityFrameworkCore;
 using FoodShop.Api.Order.Data;
+using FoodShop.Api.Order.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +26,18 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+
+builder.Services.AddScoped<IProductCatalog, ProductCatalog>();
+builder.Services.AddScoped<IOrderCalculator, OrderCalculator>();
+
+builder.Services.AddKeyedScoped<IOrderCalculationStage, ProductCalculationStage>(ProductCalculationStage.DEFAULT_SERVICE_KEY);
+
+
+
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
