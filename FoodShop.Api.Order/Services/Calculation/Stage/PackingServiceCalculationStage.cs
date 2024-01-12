@@ -8,13 +8,10 @@ public class PackingServiceCalculationStage : IOrderCalculationStage
 
     public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
     {
-        return new OrderCalculation[] { new OrderCalculation() {
-            TypeCode = OrderCalculationTypeCodes.Service,
+        return new OrderCalculation[] { orderCalculationContext.CreateCalculation(c => {
+            c.TypeCode = OrderCalculationTypeCodes.Service;
             //TODO: from DB
-            Amount = 0.5M,
-            //TODO: to OrderCalculator level?
-            Order = orderCalculationContext.Order,
-            CreateDate = orderCalculationContext.Now,
-        } };
+            c.Amount = .5M;
+        })};
     }
 }

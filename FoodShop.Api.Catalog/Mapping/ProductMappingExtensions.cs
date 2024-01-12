@@ -12,18 +12,16 @@ public static class ProductMappingExtensions
         productDto.Name = product.Name;
         productDto.Description = product.Description;
         productDto.Brand = product.Brand != null
-            ? new()
-            {
-                Id = product.Brand!.Id,
-                Name = product.Brand!.Name,
-            }
+            ? new() {
+                    Id = product.Brand!.Id,
+                    Name = product.Brand!.Name,
+              }
             : null;
         productDto.Category = product.Category != null
-            ? new()
-            {
-                Id = product.Category!.Id,
-                Name = product.Category!.Name,
-            }
+            ? new() {
+                    Id = product.Category!.Id,
+                    Name = product.Category!.Name,
+              }
             : null;
         productDto.Popularity = product.Popularity;
         productDto.CustomerRating = product.CustomerRating;
@@ -42,6 +40,7 @@ public static class ProductMappingExtensions
     {
         SetupOfferedProductDto(offeredProductBatchDto, product, offerLink);
         offeredProductBatchDto.Quantity = quantity;
+        offeredProductBatchDto.Amount = ProductPriceStrategy.Default.GetAmount(product.Price, quantity);
         offeredProductBatchDto.OfferAmount = offerLink.ProductPriceStrategy.GetAmount(product.Price, quantity);
     }
 

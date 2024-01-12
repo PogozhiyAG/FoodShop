@@ -8,5 +8,6 @@ public class CalculatedOrderItem
     public string? StrategyName { get; set; }
     public decimal OfferPrice { get; set; }
     public int Quantity { get; set; }
+    public decimal Amount { get; set; }
     public decimal OfferAmount { get; set; }
 }

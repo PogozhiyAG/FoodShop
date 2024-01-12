@@ -13,13 +13,10 @@ public class DeliveryCalculationStage : IOrderCalculationStage
             return Array.Empty<OrderCalculation>();
         }
 
-        return new OrderCalculation[] { new OrderCalculation() {
-            TypeCode = OrderCalculationTypeCodes.Delivery,
+        return new OrderCalculation[] { orderCalculationContext.CreateCalculation(c => {
+            c.TypeCode = OrderCalculationTypeCodes.Delivery;
             //TODO: from DB or delivery service
-            Amount = 3.5M,
-            //TODO: to OrderCalculator level?
-            Order = orderCalculationContext.Order,
-            CreateDate = orderCalculationContext.Now,
-        } };
+            c.Amount = 3.5M;
+        })};
     }
 }

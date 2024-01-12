@@ -9,7 +9,7 @@ public class OrderCalculation
     public DateTime CreateDate { get; set; }
     public string? Description { get; set; }
     public decimal Amount { get; set; }
-    public ICollection<OrderCalculationProperty> Properties { get; set; }
+    public ICollection<OrderCalculationProperty> Properties { get; set; } = new List<OrderCalculationProperty>();
 }
 
 
