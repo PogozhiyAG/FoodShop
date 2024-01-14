@@ -7,8 +7,7 @@ public class ProductCalculationStage : IOrderCalculationStage
 {
     public const string DEFAULT_SERVICE_KEY = "product";
 
-    public const string PROPERTY_PRODUCT = "P";
-    public const string PROPERTY_STRATEGY = "S";
+    public const string PROPERTY_PRICE_STRATEGY = "S";
     public const string PROPERTY_TOKEN_TYPE = "T";
 
     private readonly IProductCatalog _productCatalog;
@@ -20,31 +19,31 @@ public class ProductCalculationStage : IOrderCalculationStage
 
     public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
     {
+        var itemsDictionary = orderCalculationContext.Order.Items.ToDictionary(i => i.ProductId);
         var calculatedProducts = await _productCatalog.CalculateProducts(orderCalculationContext.Order.Items);
-        var result = calculatedProducts.SelectMany(p => GetOrderItemCalculation(orderCalculationContext, p));
+        var result = calculatedProducts.SelectMany(p => GetOrderItemCalculation(orderCalculationContext, p, itemsDictionary[p.Id.ToString()]));
         return result;
     }
 
-    private IEnumerable<OrderCalculation> GetOrderItemCalculation(OrderCalculationContext orderCalculationContext, CalculatedOrderItem item)
+    private IEnumerable<OrderCalculation> GetOrderItemCalculation(OrderCalculationContext orderCalculationContext, CalculatedOrderItem item, OrderItem orderItem)
     {
         yield return orderCalculationContext.CreateCalculation(c => {
+            c.OrderItem = orderItem;
             c.TypeCode = OrderCalculationTypeCodes.Product;
             c.Amount = item.Amount;
-            c.Properties.Add(new() { Name = PROPERTY_PRODUCT, Value = item.Id.ToString() });
         });
 
         var discount = item.OfferAmount - item.Amount;
         if(discount != 0)
         {
             yield return orderCalculationContext.CreateCalculation(c => {
+                c.OrderItem = orderItem;
                 c.TypeCode = OrderCalculationTypeCodes.ProductDiscount;
                 c.Amount = discount;
 
-                c.Properties.Add(new() { Name = PROPERTY_PRODUCT, Value = item.Id.ToString() });
-
                 if (!string.IsNullOrEmpty(item.StrategyName))
                 {
-                    c.Properties.Add(new() { Name = PROPERTY_STRATEGY, Value = item.StrategyName });
+                    c.Properties.Add(new() { Name = PROPERTY_PRICE_STRATEGY, Value = item.StrategyName });
                 }
 
                 if (!string.IsNullOrEmpty(item.TokenTypeCode))

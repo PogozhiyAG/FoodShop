@@ -14,6 +14,7 @@ public class OrderDbContext : DbContext
     public DbSet<OrderCalculation> OrderCalculations { get; set; }
     public DbSet<OrderCalculationProperty> OrderCalculationProperties { get; set; }
     public DbSet<DeliveryInfo> DeliveryInfos { get; set; }
+    public DbSet<OrderAmountCorrection> OrderAmountCorrections { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -13,13 +13,13 @@ namespace FoodShop.Api.Order.Controllers;
 [Route("[controller]")]
 public class OrderController : ControllerBase
 {
-    private readonly OrderDbContext _orderDbContext;
+    IDbContextFactory<OrderDbContext> _dbContextFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IOrderCalculator _orderCalculator;
 
-    public OrderController(OrderDbContext orderDbContext, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator)
+    public OrderController(IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator)
     {
-        _orderDbContext = orderDbContext;
+        _dbContextFactory = dbContextFactory;
         _httpContextAccessor = httpContextAccessor;
         _orderCalculator = orderCalculator;
     }
@@ -29,7 +29,8 @@ public class OrderController : ControllerBase
     [HttpGet]
     public IActionResult Get(Guid id)
     {
-        var order = _orderDbContext.Orders
+        using var orderDbContext = _dbContextFactory.CreateDbContext();
+        var order = orderDbContext.Orders
             .AsNoTracking()
             .Include(o => o.Items)
             .Where(o => o.Id == id)
@@ -81,12 +82,13 @@ public class OrderController : ControllerBase
             };
         }
 
-        _orderDbContext.Add(order);
+        using var orderDbContext = _dbContextFactory.CreateDbContext();
+        orderDbContext.Add(order);
 
         var orderCalculations = (await _orderCalculator.CalculateOrder(order)).ToList();
-        _orderDbContext.AddRange(orderCalculations);
+        orderDbContext.AddRange(orderCalculations);
 
-        await _orderDbContext.SaveChangesAsync();
+        await orderDbContext.SaveChangesAsync();
 
         //TODO: Created?
         return Ok(order.Id);

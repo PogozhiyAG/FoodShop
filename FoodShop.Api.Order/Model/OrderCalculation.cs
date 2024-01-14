@@ -5,6 +5,8 @@ public class OrderCalculation
     public Guid Id { get; set; }
     public Guid OrderId { get; set; }
     public Order Order { get; set; }
+    public Guid? OrderItemId { get; set; }
+    public OrderItem? OrderItem { get; set; }
     public string TypeCode { get; set; }
     public DateTime CreateDate { get; set; }
     public string? Description { get; set; }

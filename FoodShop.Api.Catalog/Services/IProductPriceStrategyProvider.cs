@@ -28,7 +28,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
         var strategies = GetStrategies();
 
-        var fullTokenTypeIds = tokenTypeIds.Append(null);
+        var fullTokenTypeIds = tokenTypeIds.Append(null).Distinct(); ;
         foreach (var tokenTypeId in fullTokenTypeIds)
         {
             foreach (var referenceId in GetReferencesFromProduct(product))

@@ -7,4 +7,5 @@ public class OrderItem
     public Order Order { get; set; }
     public string ProductId { get; set; }
     public int Quantity { get; set; }
+    public ICollection<OrderCalculation> OrderCalculations { get; set; }
 }

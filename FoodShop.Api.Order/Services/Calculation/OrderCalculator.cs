@@ -9,28 +9,6 @@ public interface IOrderCalculator
 }
 
 
-public class OrderCalculationContext
-{
-    public required Model.Order Order { get; set; }
-    public IEnumerable<OrderCalculation> CalculationResult { get; set; }
-    public DateTime Now { get; set; } = DateTime.UtcNow;
-
-    public OrderCalculation CreateCalculation(Action<OrderCalculation> calculationSetup) {
-        var result = new OrderCalculation() {
-            Order = Order,
-            CreateDate = Now
-        };
-
-        if(calculationSetup != null)
-        {
-            calculationSetup(result);
-        }
-
-        return result;
-    }
-}
-
-
 public class OrderCalculator : IOrderCalculator
 {
     private readonly IConfiguration _configuration;
