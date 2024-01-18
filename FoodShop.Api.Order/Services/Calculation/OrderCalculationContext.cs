@@ -6,9 +6,7 @@ namespace FoodShop.Api.Order.Services.Calculation;
 public class OrderCalculationContext
 {
     public required Model.Order Order { get; set; }
-    public DateTime Now { get; set; } = DateTime.UtcNow;
-
-    public List<ProductBatchInfo> CalculatedOrderItems { get; set; } = new();
+    public List<ProductBatchInfo> ProductBatchInfos { get; set; } = new();
 
     public OrderCalculation CreateCalculation(Action<OrderCalculation> calculationSetup)
     {
@@ -17,7 +15,7 @@ public class OrderCalculationContext
             Id = Guid.NewGuid(),
             OrderId = Order.Id,
             Order = Order,
-            CreateDate = Now
+            CreateDate = DateTime.UtcNow
         };
 
         if (calculationSetup != null)

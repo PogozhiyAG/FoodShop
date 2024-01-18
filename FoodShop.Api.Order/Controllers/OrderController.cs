@@ -1,6 +1,8 @@
 ﻿using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Dto;
+using FoodShop.Api.Order.Dto.Extensions;
 using FoodShop.Api.Order.Model;
+using FoodShop.Api.Order.Model.Extensions;
 using FoodShop.Api.Order.Services;
 using FoodShop.Api.Order.Services.Calculation;
 using Microsoft.AspNetCore.Authorization;
@@ -47,14 +49,16 @@ public class OrderController : ControllerBase
         }
 
         //TODO: Draft. rename OrderCalculationContext => smt else
-        var ctx = new OrderCalculationContext() { Order = order };
-        ctx.CalculatedOrderItems = await _productCatalog.GetProductBatchInfos(order.Items.Select(i => new ValueTuple<string, int>(i.ProductId, i.Quantity)));
+        var result = new OrderCalculationContext() {
+            Order = order
+        };
+        result.ProductBatchInfos = await _productCatalog.GetProductBatchInfos(order.Items.ToProductBatchInfoRequest());
 
-        return Ok(ctx);
+        return Ok(result);
     }
 
 
-    [HttpPost()]
+    [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateOrderRequest createOrderRequest)
     {
         var order = createOrderRequest.ToOrder(o =>
@@ -63,14 +67,14 @@ public class OrderController : ControllerBase
             o.UserId = GetUserName();
         });
 
-        var orderCalculationCtx = await _orderCalculator.CalculateOrder(order);
+        var result = await _orderCalculator.CalculateOrder(order);
 
         using var orderDbContext = _dbContextFactory.CreateDbContext();
         orderDbContext.Add(order);
         await orderDbContext.SaveChangesAsync();
 
         //TODO: Created?
-        return Ok(orderCalculationCtx);
+        return Ok(result);
     }
 
 
@@ -82,8 +86,8 @@ public class OrderController : ControllerBase
             o.Status = OrderStatus.Draft;
         });
 
-        var orderCalculationCtx = await _orderCalculator.CalculateOrder(order);
-        return Ok(orderCalculationCtx);
+        var result = await _orderCalculator.CalculateOrder(order);
+        return Ok(result);
     }
 }
 

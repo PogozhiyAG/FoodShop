@@ -38,7 +38,11 @@ public class OrderCalculator : IOrderCalculator
 
             foreach (var calculation in calculations)
             {
-                order.OrderCalculations.Add(calculation);
+                calculation.Amount = Math.Round(calculation.Amount, 2);
+                if (calculation.Amount != 0.0M)
+                {
+                    order.OrderCalculations.Add(calculation);
+                }
             }
         }
 

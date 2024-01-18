@@ -1,5 +1,6 @@
 ﻿using FoodShop.Api.Order.Dto.Catalog;
 using FoodShop.Api.Order.Model;
+using FoodShop.Api.Order.Model.Extensions;
 
 namespace FoodShop.Api.Order.Services.Calculation.Stage;
 
@@ -19,9 +20,9 @@ public class ProductCalculationStage : IOrderCalculationStage
 
     public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
     {
-        orderCalculationContext.CalculatedOrderItems = await _productCatalog.GetProductBatchInfos(orderCalculationContext.Order.Items.Select(i => new ValueTuple<string, int>(i.ProductId, i.Quantity)));
+        orderCalculationContext.ProductBatchInfos = await _productCatalog.GetProductBatchInfos(orderCalculationContext.Order.Items.ToProductBatchInfoRequest());
         var itemsDictionary = orderCalculationContext.Order.Items.ToDictionary(i => i.ProductId);
-        var result = orderCalculationContext.CalculatedOrderItems.SelectMany(p => GetOrderItemCalculation(orderCalculationContext, p, itemsDictionary[p.Id.ToString()]));
+        var result = orderCalculationContext.ProductBatchInfos.SelectMany(p => GetOrderItemCalculation(orderCalculationContext, p, itemsDictionary[p.Id.ToString()]));
         return result;
     }
 

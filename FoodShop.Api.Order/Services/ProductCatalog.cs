@@ -5,7 +5,7 @@ namespace FoodShop.Api.Order.Services;
 
 public interface IProductCatalog
 {
-    Task<List<ProductBatchInfo>> GetProductBatchInfos(IEnumerable<(string, int)> productBatchRequests);
+    Task<List<ProductBatchInfo>> GetProductBatchInfos(ProductBatchInfoRequest request);
 }
 
 
@@ -22,14 +22,10 @@ public class ProductCatalog : IProductCatalog
         _configuration = configuration;
     }
 
-    public async Task<List<ProductBatchInfo>> GetProductBatchInfos(IEnumerable<(string, int)> productBatchRequests)
+    public async Task<List<ProductBatchInfo>> GetProductBatchInfos(ProductBatchInfoRequest request)
     {
         var httpClient = _httpClientFactory.CreateClient();
         var url = _configuration["ApiUrls:FoodShop.Api.Catalog"];
-
-        var request = new ProductBatchCalculationRequest() {
-            Items = productBatchRequests.ToDictionary(i => i.Item1, i => i.Item2)
-        };
 
         var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url)
         {
@@ -48,8 +44,3 @@ public class ProductCatalog : IProductCatalog
     }
 }
 
-public class ProductBatchCalculationRequest
-{
-    public Dictionary<string, int> Items { get; set; } = new();
-
-}
