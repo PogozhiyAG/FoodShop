@@ -19,15 +19,16 @@ public class ProductCalculationStage : IOrderCalculationStage
 
     public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
     {
+        orderCalculationContext.CalculatedOrderItems = await _productCatalog.CalculateProducts(orderCalculationContext.Order.Items.Select(i => new ValueTuple<string, int>(i.ProductId, i.Quantity)));
         var itemsDictionary = orderCalculationContext.Order.Items.ToDictionary(i => i.ProductId);
-        var calculatedProducts = await _productCatalog.CalculateProducts(orderCalculationContext.Order.Items);
-        var result = calculatedProducts.SelectMany(p => GetOrderItemCalculation(orderCalculationContext, p, itemsDictionary[p.Id.ToString()]));
+        var result = orderCalculationContext.CalculatedOrderItems.SelectMany(p => GetOrderItemCalculation(orderCalculationContext, p, itemsDictionary[p.Id.ToString()]));
         return result;
     }
 
     private IEnumerable<OrderCalculation> GetOrderItemCalculation(OrderCalculationContext orderCalculationContext, CalculatedOrderItem item, OrderItem orderItem)
     {
         yield return orderCalculationContext.CreateCalculation(c => {
+            c.OrderItemId = orderItem.Id;
             c.OrderItem = orderItem;
             c.TypeCode = OrderCalculationTypeCodes.Product;
             c.Amount = item.Amount;
@@ -37,6 +38,7 @@ public class ProductCalculationStage : IOrderCalculationStage
         if(discount != 0)
         {
             yield return orderCalculationContext.CreateCalculation(c => {
+                c.OrderItemId = orderItem.Id;
                 c.OrderItem = orderItem;
                 c.TypeCode = OrderCalculationTypeCodes.ProductDiscount;
                 c.Amount = discount;

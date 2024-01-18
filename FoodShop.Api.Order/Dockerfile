@@ -6,17 +6,15 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["FoodShop.Api.Order/FoodShop.Api.Order.csproj", "FoodShop.Api.Order/"]
 RUN dotnet restore "./FoodShop.Api.Order/./FoodShop.Api.Order.csproj"
 COPY . .
 WORKDIR "/src/FoodShop.Api.Order"
-RUN dotnet build "./FoodShop.Api.Order.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./FoodShop.Api.Order.csproj" -c Release -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./FoodShop.Api.Order.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./FoodShop.Api.Order.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

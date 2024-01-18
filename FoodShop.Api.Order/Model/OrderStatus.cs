@@ -2,6 +2,7 @@
 
 public enum OrderStatus
 {
+    Draft,
     Created,
     Confirmed,
     Paid,

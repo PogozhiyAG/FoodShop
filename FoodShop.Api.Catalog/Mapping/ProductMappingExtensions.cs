@@ -11,6 +11,7 @@ public static class ProductMappingExtensions
         productDto.Id = product.Id;
         productDto.Name = product.Name;
         productDto.Description = product.Description;
+        productDto.ImageUri = product.ImageUri;
         productDto.Brand = product.Brand != null
             ? new() {
                     Id = product.Brand!.Id,
@@ -26,6 +27,7 @@ public static class ProductMappingExtensions
         productDto.Popularity = product.Popularity;
         productDto.CustomerRating = product.CustomerRating;
         productDto.Price = product.Price;
+        productDto.Tags.AddRange(product.Tags.Select(r => r.Tag.Name));
     }
 
     private static void SetupOfferedProductDto(OfferedProductDto offeredProductDto, Product product, ProductPriceStrategyLink offerLink)

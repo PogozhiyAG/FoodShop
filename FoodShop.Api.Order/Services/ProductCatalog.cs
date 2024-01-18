@@ -1,13 +1,11 @@
-﻿
-using FoodShop.Api.Order.Dto.Catalog;
-using FoodShop.Api.Order.Model;
+﻿using FoodShop.Api.Order.Dto.Catalog;
 using Microsoft.Net.Http.Headers;
 
 namespace FoodShop.Api.Order.Services;
 
 public interface IProductCatalog
 {
-    Task<List<CalculatedOrderItem>> CalculateProducts(IEnumerable<OrderItem> orderItems);
+    Task<List<CalculatedOrderItem>> CalculateProducts(IEnumerable<(string, int)> orderItems);
 }
 
 
@@ -24,13 +22,13 @@ public class ProductCatalog : IProductCatalog
         _configuration = configuration;
     }
 
-    public async Task<List<CalculatedOrderItem>> CalculateProducts(IEnumerable<OrderItem> orderItems)
+    public async Task<List<CalculatedOrderItem>> CalculateProducts(IEnumerable<(string, int)> orderItems)
     {
         var httpClient = _httpClientFactory.CreateClient();
         var url = _configuration["ApiUrls:FoodShop.Api.Catalog"];
 
         var request = new ProductBatchCalculationRequest() {
-            Items = orderItems.ToDictionary(i => i.ProductId, i => i.Quantity)
+            Items = orderItems.ToDictionary(i => i.Item1, i => i.Item2)
         };
 
         var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url)

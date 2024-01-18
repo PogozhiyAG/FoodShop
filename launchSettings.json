@@ -3,15 +3,18 @@
     "Docker Compose": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
-        "serviceActions": {
-            "foodshop.api.catalog": "StartDebugging",
-            "foodshop.api.auth": "StartDebugging",
-            "foodshop.api.basket": "StartDebugging",
-            "foodshop.api.order": "StartDebugging",
-            "foodshop.api.customerprofile": "StartDebugging",
-            "sqldata": "StartWithoutDebugging",
-            "basketdata": "StartWithoutDebugging"
-        }
+      "composeLaunchAction": "LaunchBrowser",
+      "composeLaunchServiceName": "foodshop.api.order",
+      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
+      "serviceActions": {
+        "foodshop.api.catalog": "StartDebugging",
+        "foodshop.api.auth": "StartDebugging",
+        "foodshop.api.basket": "StartDebugging",
+        "foodshop.api.order": "StartDebugging",
+        "foodshop.api.customerprofile": "StartDebugging",
+        "sqldata": "StartWithoutDebugging",
+        "basketdata": "StartWithoutDebugging"
+      }
     }
   }
 }

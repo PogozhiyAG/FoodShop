@@ -7,6 +7,8 @@ public class CorrectionCalculationStage : IOrderCalculationStage
 {
     public const string DEFAULT_SERVICE_KEY = "correction";
 
+    public const string PROPERTY_CORRECTION = "C";
+
     private readonly IOrderAmountCorrectionsProvider _orderAmountCorrectionsProvider;
     private readonly ICustomerProfile _customerProfile;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -36,6 +38,8 @@ public class CorrectionCalculationStage : IOrderCalculationStage
                 c.Amount = item.GetExpression()(orderCalculationContext);
             });
 
+            calculation.Properties.Add(new OrderCalculationProperty() { Name = PROPERTY_CORRECTION, Value = item.Id.ToString() });
+
             yield return calculation;
         }
     }
@@ -48,7 +52,7 @@ public class CorrectionCalculationStage : IOrderCalculationStage
         {
             return Array.Empty<string>();
         }
-
+        //TODO: JWT delegating?
         return await _customerProfile.GetTokenTypes(principal.Identity.Name);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Dto;
 using FoodShop.Api.Order.Model;
+using FoodShop.Api.Order.Services;
 using FoodShop.Api.Order.Services.Calculation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,23 +17,27 @@ public class OrderController : ControllerBase
     IDbContextFactory<OrderDbContext> _dbContextFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IOrderCalculator _orderCalculator;
+    private readonly IProductCatalog _productCatalog;
 
-    public OrderController(IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator)
+    public OrderController(IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator, IProductCatalog productCatalog)
     {
         _dbContextFactory = dbContextFactory;
         _httpContextAccessor = httpContextAccessor;
         _orderCalculator = orderCalculator;
+        _productCatalog = productCatalog;
     }
 
     private string GetUserName() => _httpContextAccessor.HttpContext!.User.Identity!.Name!;
 
     [HttpGet]
-    public IActionResult Get(Guid id)
+    public async Task<IActionResult> Get(Guid id)
     {
         using var orderDbContext = _dbContextFactory.CreateDbContext();
         var order = orderDbContext.Orders
             .AsNoTracking()
             .Include(o => o.Items)
+            .Include(o => o.OrderCalculations)
+                .ThenInclude(c => c.Properties)
             .Where(o => o.Id == id)
             .FirstOrDefault();
 
@@ -40,58 +45,45 @@ public class OrderController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(order);
+
+        //TODO: Draft. rename OrderCalculationContext => smt else
+        var ctx = new OrderCalculationContext() { Order = order };
+        ctx.CalculatedOrderItems = await _productCatalog.CalculateProducts(order.Items.Select(i => new ValueTuple<string, int>(i.ProductId, i.Quantity)));
+
+        return Ok(ctx);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody]CreateOrderRequest createOrderRequest)
+
+    [HttpPost()]
+    public async Task<IActionResult> Create([FromBody] CreateOrderRequest createOrderRequest)
     {
-        var now = DateTime.UtcNow;
-
-        Model.Order order = new()
+        var order = createOrderRequest.ToOrder(o =>
         {
-            Id = Guid.NewGuid(),
-            //TODO: Name or ID
-            UserId = GetUserName(),
-            CreateDate = now,
-            Status = Model.OrderStatus.Created,
-            Description = createOrderRequest.Description,
-            Items = new List<OrderItem>()
-        };
+            o.Status = OrderStatus.Created;
+            o.UserId = GetUserName();
+        });
 
-        foreach (var requestOrderItem in createOrderRequest.Items)
-        {
-            order.Items.Add(new Model.OrderItem()
-            {
-                Order = order,
-                ProductId = requestOrderItem.ProductId,
-                Quantity = requestOrderItem.Quantity
-            });
-        }
-
-        if (createOrderRequest.Delivery != null)
-        {
-            order.DeliveryInfo = new()
-            {
-                Id = Guid.NewGuid(),
-                Address = createOrderRequest.Delivery.Address,
-                ContactName = createOrderRequest.Delivery.ContactName,
-                ContactPhone = createOrderRequest.Delivery.ContactPhone,
-                TimeSlotFrom = createOrderRequest.Delivery.TimeSlotFrom,
-                TimeSlotTo = createOrderRequest.Delivery.TimeSlotTo
-            };
-        }
+        var orderCalculationCtx = await _orderCalculator.CalculateOrder(order);
 
         using var orderDbContext = _dbContextFactory.CreateDbContext();
         orderDbContext.Add(order);
-
-        var orderCalculations = (await _orderCalculator.CalculateOrder(order)).ToList();
-        orderDbContext.AddRange(orderCalculations);
-
         await orderDbContext.SaveChangesAsync();
 
         //TODO: Created?
-        return Ok(order.Id);
+        return Ok(orderCalculationCtx);
+    }
+
+
+    [HttpGet("calculate")]
+    public async Task<IActionResult> Calculate([FromBody]CreateOrderRequest createOrderRequest)
+    {
+        var order = createOrderRequest.ToOrder(o =>
+        {
+            o.Status = OrderStatus.Draft;
+        });
+
+        var orderCalculationCtx = await _orderCalculator.CalculateOrder(order);
+        return Ok(orderCalculationCtx);
     }
 }
 

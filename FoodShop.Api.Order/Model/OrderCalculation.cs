@@ -1,11 +1,15 @@
-﻿namespace FoodShop.Api.Order.Model;
+﻿using System.Text.Json.Serialization;
+
+namespace FoodShop.Api.Order.Model;
 
 public class OrderCalculation
 {
     public Guid Id { get; set; }
     public Guid OrderId { get; set; }
+    [JsonIgnore]
     public Order Order { get; set; }
     public Guid? OrderItemId { get; set; }
+    [JsonIgnore]
     public OrderItem? OrderItem { get; set; }
     public string TypeCode { get; set; }
     public DateTime CreateDate { get; set; }

@@ -6,7 +6,7 @@
     <ProjectGuid>671f55d4-ea75-4dee-a406-04a9959497be</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>foodshop.api.catalog</DockerServiceName>
+    <DockerServiceName>foodshop.api.order</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
