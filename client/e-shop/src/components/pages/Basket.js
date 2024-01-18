@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import useBasketContext from "./hooks/useContextBasket";
-import useAuth from "./hooks/useAuth";
-import PlusMinus from "./components/PlusMinus";
+import useBasketContext from "../../hooks/useContextBasket";
+import useAuth from "../../hooks/useAuth";
+import PlusMinus from "../PlusMinus";
 
 const Basket = () => {
     const basket = useBasketContext();

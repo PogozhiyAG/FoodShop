@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Product from "./components/Product";
-import useHttpClient from "./hooks/useHttpClient";
-import useBasketContext from "./hooks/useContextBasket";
-import useAuth from "./hooks/useAuth";
+import Product from "../Product";
+import useHttpClient from "../../hooks/useHttpClient";
+import useBasketContext from "../../hooks/useContextBasket";
+import useAuth from "../../hooks/useAuth";
 
 
 const Home = () => {

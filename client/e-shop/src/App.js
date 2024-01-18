@@ -4,11 +4,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from './context/AuthContext';
 import { BasketProvider } from './context/BasketContext';
 
-import Home from './Home';
-import Login from './Login';
-import Basket from './Basket';
-import Category from './Category';
-import NoPage from './NoPage';
+import Home from './components/pages/Home';
+import Login from './components/pages/Login';
+import Basket from './components/pages/Basket';
+import Category from './components/pages/Category';
+import NoPage from './components/pages/NoPage';
 
 import './App.css';
 
