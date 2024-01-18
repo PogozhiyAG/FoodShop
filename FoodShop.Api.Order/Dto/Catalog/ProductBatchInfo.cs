@@ -1,6 +1,6 @@
 ﻿namespace FoodShop.Api.Order.Dto.Catalog;
 
-public class CalculatedOrderItem
+public class ProductBatchInfo
 {
     public int Id { get; set; }
     public string? Name { get; set; }

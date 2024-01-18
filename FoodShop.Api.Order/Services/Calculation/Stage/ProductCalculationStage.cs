@@ -19,13 +19,13 @@ public class ProductCalculationStage : IOrderCalculationStage
 
     public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
     {
-        orderCalculationContext.CalculatedOrderItems = await _productCatalog.CalculateProducts(orderCalculationContext.Order.Items.Select(i => new ValueTuple<string, int>(i.ProductId, i.Quantity)));
+        orderCalculationContext.CalculatedOrderItems = await _productCatalog.GetProductBatchInfos(orderCalculationContext.Order.Items.Select(i => new ValueTuple<string, int>(i.ProductId, i.Quantity)));
         var itemsDictionary = orderCalculationContext.Order.Items.ToDictionary(i => i.ProductId);
         var result = orderCalculationContext.CalculatedOrderItems.SelectMany(p => GetOrderItemCalculation(orderCalculationContext, p, itemsDictionary[p.Id.ToString()]));
         return result;
     }
 
-    private IEnumerable<OrderCalculation> GetOrderItemCalculation(OrderCalculationContext orderCalculationContext, CalculatedOrderItem item, OrderItem orderItem)
+    private IEnumerable<OrderCalculation> GetOrderItemCalculation(OrderCalculationContext orderCalculationContext, ProductBatchInfo item, OrderItem orderItem)
     {
         yield return orderCalculationContext.CreateCalculation(c => {
             c.OrderItemId = orderItem.Id;

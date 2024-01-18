@@ -48,7 +48,7 @@ public class OrderController : ControllerBase
 
         //TODO: Draft. rename OrderCalculationContext => smt else
         var ctx = new OrderCalculationContext() { Order = order };
-        ctx.CalculatedOrderItems = await _productCatalog.CalculateProducts(order.Items.Select(i => new ValueTuple<string, int>(i.ProductId, i.Quantity)));
+        ctx.CalculatedOrderItems = await _productCatalog.GetProductBatchInfos(order.Items.Select(i => new ValueTuple<string, int>(i.ProductId, i.Quantity)));
 
         return Ok(ctx);
     }

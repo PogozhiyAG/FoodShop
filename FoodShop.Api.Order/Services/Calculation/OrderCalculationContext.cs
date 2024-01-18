@@ -8,7 +8,7 @@ public class OrderCalculationContext
     public required Model.Order Order { get; set; }
     public DateTime Now { get; set; } = DateTime.UtcNow;
 
-    public List<CalculatedOrderItem> CalculatedOrderItems { get; set; } = new();
+    public List<ProductBatchInfo> CalculatedOrderItems { get; set; } = new();
 
     public OrderCalculation CreateCalculation(Action<OrderCalculation> calculationSetup)
     {
