@@ -4,7 +4,9 @@ namespace FoodShop.Api.Order.Model;
 
 public class OrderCalculation
 {
+    [JsonIgnore]
     public Guid Id { get; set; }
+    [JsonIgnore]
     public Guid OrderId { get; set; }
     [JsonIgnore]
     public Order Order { get; set; }

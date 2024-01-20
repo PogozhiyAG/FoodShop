@@ -8,10 +8,19 @@ public class PackingServiceCalculationStage : IOrderCalculationStage
 
     public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
     {
-        return new OrderCalculation[] { orderCalculationContext.CreateCalculation(c => {
-            c.TypeCode = OrderCalculationTypeCodes.Service;
-            //TODO: from DB
-            c.Amount = .5M;
-        })};
+        return EnumerateCalculations(orderCalculationContext);
+    }
+
+    private IEnumerable<OrderCalculation> EnumerateCalculations(OrderCalculationContext orderCalculationContext)
+    {
+        if(orderCalculationContext.Order.Items.Count > 0)
+        {
+            yield return orderCalculationContext.CreateCalculation(c =>
+            {
+                c.TypeCode = OrderCalculationTypeCodes.Service;
+                //TODO: from DB
+                c.Amount = .5M;
+            });
+        }
     }
 }

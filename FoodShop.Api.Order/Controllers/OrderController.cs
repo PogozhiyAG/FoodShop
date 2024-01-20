@@ -78,7 +78,7 @@ public class OrderController : ControllerBase
     }
 
 
-    [HttpGet("calculate")]
+    [HttpPost("calculate")]
     public async Task<IActionResult> Calculate([FromBody]CreateOrderRequest createOrderRequest)
     {
         var order = createOrderRequest.ToOrder(o =>

@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Product from "../Product";
 import useHttpClient from "../../hooks/useHttpClient";
-import useBasketContext from "../../hooks/useContextBasket";
 import useAuth from "../../hooks/useAuth";
+import useOrderContext from "../../hooks/useContextOrder";
 
 
-const Home = () => {
-  const basket = useBasketContext();
+const Home = () => {  
+  const order = useOrderContext();
   const auth = useAuth();
 
   const [products, setProducts] = useState([]);
@@ -48,7 +48,7 @@ const Home = () => {
         <Link className="p-2" to="/basket">Basket</Link>
         <Link className="p-2" to="/login">Login</Link>
         <span className="p-2">{getUserDisplayName()}</span>
-        <span className="m-2 h2 badge badge-success">{basket.getTotalAmount()}</span>
+        <span className="m-2 h2 badge badge-success">{order.getTotalAmount()}</span>
       </header>
     
 
