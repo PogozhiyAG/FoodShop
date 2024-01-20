@@ -1,24 +1,24 @@
 import { Link } from "react-router-dom";
-import useBasketContext from "../../hooks/useContextBasket";
 import useAuth from "../../hooks/useAuth";
 import PlusMinus from "../PlusMinus";
+import useContextOrder from "../../hooks/useContextOrder";
 
 const Basket = () => {
-    const basket = useBasketContext();
+    const order = useContextOrder();
     const auth = useAuth();
 
     const getUserDisplayName = () => auth.state.userName ? 'Logged in' : 'Anonymous';
 
     const handleAddToBasket = (product) => {
-        basket.add(product.id, 1);
+        order.basket.add(product.id, 1);
     }
 
     const handleRemoveFromBasket = (product) => {
-        basket.add(product.id, -1);
+        order.basket.add(product.id, -1);
     }
 
     const handleRemoveProduct = (product) => {
-        basket.set(product.id, 0);
+        order.basket.set(product.id, 0);
     }
     
     return (
@@ -33,8 +33,8 @@ const Basket = () => {
                 <h1 className="mb-5">Basket</h1>                
                 
 
-                {basket.positions.map(product => {
-                    const imageSrc = `food${product.id % 10}.jpg`;
+                {order.enumerateOrderItems().map(item => {
+                    const imageSrc = `food${item.product.id % 10}.jpg`;
                     
                     return( 
                         <section className="row border-bottom py-2">
@@ -42,23 +42,23 @@ const Basket = () => {
                                 <img src={imageSrc} className="basket-product-image"/>    
                             </div>
                             <div className="col-md-6">
-                                <Link>{product.name}</Link>
+                                <Link>{item.product.name}</Link>
                             </div>
                             <div className="col-md-1 text-end fs-5">
-                                £{product.basePrice}
+                                £{item.product.basePrice}
                             </div>
                             <div className="col-md-2">
                                 <PlusMinus 
-                                    onMinus={() => handleRemoveFromBasket(product)} 
-                                    onPlus={() => handleAddToBasket(product)}
-                                    value={product.quantity}
+                                    onMinus={() => handleRemoveFromBasket(item.product)} 
+                                    onPlus={() => handleAddToBasket(item.product)}
+                                    value={item.product.quantity}
                                 />
                             </div>
                             <div className="col-md-1 text-end fs-5">
-                                £{product.offerAmount}
+                                £{item.totalAmount}
                             </div>
                             <div className="col-md-1">
-                                <button className="button-light" onClick={() => handleRemoveProduct(product)}>
+                                <button className="button-light" onClick={() => handleRemoveProduct(item.product)}>
                                     X
                                 </button>
                             </div>
@@ -69,14 +69,14 @@ const Basket = () => {
 
                 <div className="row">
                     <div className="col-md-11 d-flex flex-row-reverse">
-                        <span className="fs-2">£{basket.getTotalAmount() }</span>
+                        <span className="fs-2">£{order.getTotalAmount() }</span>
                     </div>                    
                 </div> 
                 <div className="row mt-3">
                     <div className="col-md-11 d-flex flex-row-reverse">
                         <button className="basket-button px-5">Checkout</button>
                     </div>                    
-                </div> 
+                </div>
             </main>
         </>
     );

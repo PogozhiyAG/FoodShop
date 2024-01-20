@@ -1,5 +1,4 @@
-import { createContext, useContext, useEffect } from "react";
-import useBasket from "../hooks/useBasket";
+import { createContext, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import useOrder from "../hooks/useOrder";
 
@@ -8,15 +7,14 @@ export const BasketContext = createContext({});
 
 
 export const BasketProvider = ({children}) => {    
-    const auth = useAuth();
-    const basket = useBasket();
-    const order = useOrder(basket.positions);
+    const auth = useAuth();    
+    const order = useOrder();
 
-    useEffect(() => basket.reload(), [auth.sync]);
+    useEffect(() => order.basket.reload(), [auth.sync]);
     
        
     return (
-        <BasketContext.Provider value={{basket, order}}>
+        <BasketContext.Provider value={order}>
             {children}
         </BasketContext.Provider>
     );

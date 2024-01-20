@@ -1,20 +1,20 @@
 import { Link } from "react-router-dom";
-import useBasketContext from "../hooks/useContextBasket";
 import PlusMinus from "./PlusMinus";
+import useContextOrder from "../hooks/useContextOrder";
 
 
 const Product = ({product}) => {
-    const basket = useBasketContext();
+    const order = useContextOrder();
 
     const handleAddToBasket = () => {
-        basket.add(product.id, 1);
+        order.basket.add(product.id, 1);
     }
 
     const handleRemoveFromBasket = () => {
-        basket.add(product.id, -1);
+        order.basket.add(product.id, -1);
     }
 
-    const basketQuantity = basket.getPosition(product.id)?.quantity;  
+    const basketQuantity = order.basket.getPosition(product.id)?.quantity;  
     
     const imageSrc = `food${product.id % 10}.jpg`;
 
