@@ -10,7 +10,13 @@ const useOrder = () => {
     const [calculatedOrder, setCalculatedOrder] = useState();
     const {getData} = useHttpClient();
 
-    useEffect(() => calculateOrder(), [items, delivery, promoCodes]);
+    useEffect(() => {
+        if(!items.length){
+            return setCalculatedOrder(null);
+        }
+        calculateOrder();
+    }, [items, delivery, promoCodes]);
+    
 
     const createCalculationRequest = () => {
         return {
@@ -37,12 +43,23 @@ const useOrder = () => {
         return calculatedOrder.order.orderCalculations.reduce((a, p) => a + p.amount, 0).toFixed(2);
     }
 
-    const enumerateOrderItems = () => 
-        calculatedOrder.order.items.map(i => ({
-            product: calculatedOrder.productBatchInfos.find(p => `${p.id}` === i.productId),
-            calculations: calculatedOrder.order.orderCalculations.filter(c => c.orderItemId === i.id),
-            totalAmount: calculatedOrder.order.orderCalculations.filter(c => c.orderItemId === i.id).reduce((a, p) => a + p.amount, 0).toFixed(2)
-        }));
+    const enumerateOrderItems = () => {
+        if(!calculatedOrder){
+            return [];
+        }
+
+        return calculatedOrder.order.items.map(i => {
+            const calculations  = calculatedOrder.order.orderCalculations.filter(c => c.orderItemId === i.id);
+            const sum = (...typeCodes) => calculations.filter(c => typeCodes.length === 0 || typeCodes.includes(c.typeCode)).reduce((a, p) => a + p.amount, 0).toFixed(2);
+            return {
+                product: calculatedOrder.productBatchInfos.find(p => `${p.id}` === i.productId),
+                calculations,
+                totalAmount: sum(),
+                amount: sum('P'),
+                saving: sum('PD')
+            }
+        });
+    }
 
     return {
         basket: {

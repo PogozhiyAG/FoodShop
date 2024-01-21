@@ -10,7 +10,10 @@ export const BasketProvider = ({children}) => {
     const auth = useAuth();    
     const order = useOrder();
 
-    useEffect(() => order.basket.reload(), [auth.sync]);
+    useEffect(() => {
+        console.log('DBG_01');
+        order.basket.reload();
+    }, [auth.sync]);
     
        
     return (

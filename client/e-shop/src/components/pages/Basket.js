@@ -33,19 +33,19 @@ const Basket = () => {
                 <h1 className="mb-5">Basket</h1>                
                 
 
-                {order.enumerateOrderItems().map(item => {
+                {order.enumerateOrderItems().map((item, i) => {
                     const imageSrc = `food${item.product.id % 10}.jpg`;
                     
                     return( 
-                        <section className="row border-bottom py-2">
+                        <section className="row border-bottom py-2" key={item.product.id}>
                             <div className="col-md-1">
                                 <img src={imageSrc} className="basket-product-image"/>    
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-4">
                                 <Link>{item.product.name}</Link>
                             </div>
                             <div className="col-md-1 text-end fs-5">
-                                £{item.product.basePrice}
+                                £{item.product.price}
                             </div>
                             <div className="col-md-2">
                                 <PlusMinus 
@@ -53,6 +53,12 @@ const Basket = () => {
                                     onPlus={() => handleAddToBasket(item.product)}
                                     value={item.product.quantity}
                                 />
+                            </div>
+                            <div className="col-md-1 text-end fs-5">
+                                £{item.amount}
+                            </div>
+                            <div className="col-md-1 text-end fs-5">
+                                £{item.saving}
                             </div>
                             <div className="col-md-1 text-end fs-5">
                                 £{item.totalAmount}
