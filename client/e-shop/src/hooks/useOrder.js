@@ -1,14 +1,25 @@
-
 import { useEffect, useState } from "react";
 import useHttpClient from "./useHttpClient";
+import useAuth from "./useAuth";
 
 
-const useOrder = ({customerProfile, basket}) => {    
-    const [delivery, setDelivery] = useState();    
+const useOrder = ({customerProfile, basket}) => {  
+    const auth = useAuth();        
     const [calculatedOrder, setCalculatedOrder] = useState();
 
     const {getData} = useHttpClient();
-    
+
+    useEffect(() => {
+        Promise.allSettled([
+            basket.fetchData(),
+            customerProfile.fetchData()
+        ]).then(values => {            
+            basket.setBasket(values[0].value);
+            customerProfile.setProfile(values[1].value)
+        });
+    }, [auth.sync]);
+
+
     useEffect(() => { 
         calculateOrder();
     }, [basket.basket, customerProfile.profile]);
@@ -72,10 +83,7 @@ const useOrder = ({customerProfile, basket}) => {
         return calculatedOrder.order.orderCalculations.reduce((a, i) => {a[i.typeCode] = i.amount + (a[i.typeCode] ? a[i.typeCode] : 0.0); return a;}, {});        
     }
 
-    return {
-        delivery,
-        setDelivery,
-        
+    return {        
         calculatedOrder,
         calculateOrder,
 

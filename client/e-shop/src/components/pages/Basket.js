@@ -35,12 +35,12 @@ const Basket = () => {
                 <Link className="p-2" to="/login">Login</Link> 
                 <span className="p-2">{getUserDisplayName()}</span>               
             </header>
-            <main className="container">
+            <main className="container mb-5">
                 <h1 className="mb-5">Basket</h1>                
                 
 
                 {order.enumerateOrderItems().map((item, i) => {
-                    const imageSrc = `food${item.product.id % 10}.jpg`;
+                    const imageSrc = `food${item.product.id % 20}.jpg`;
                     
                     return( 
                         <section className="row border-bottom py-2" key={item.product.id}>

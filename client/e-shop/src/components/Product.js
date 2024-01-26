@@ -18,7 +18,7 @@ const Product = ({product}) => {
 
     const basketQuantity = basket.getPosition(product.id);  
     
-    const imageSrc = `food${product.id % 10}.jpg`;
+    const imageSrc = `food${product.id % 20}.jpg`;
 
     return(
         <div className="col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-12 product-item-outer">            

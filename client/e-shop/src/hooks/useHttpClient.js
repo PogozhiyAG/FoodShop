@@ -10,8 +10,6 @@ const useHttpClient = () => {
   const authState = useAuth().state;
 
   const getAccessToken = async (issuedToken) => {
-      
-
       let accessToken;
 
       const get = async (issuedToken) => {   
@@ -27,7 +25,7 @@ const useHttpClient = () => {
               result = await fetch(AuthApiUrls.RefreshUrl, {
                   method: 'POST',
                   headers: { 
-                  'Content-Type': 'application/json' 
+                    'Content-Type': 'application/json' 
                   },
                   body: JSON.stringify({refreshToken: authState.refreshToken})
               })
