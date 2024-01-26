@@ -3,30 +3,34 @@ import { useEffect, useState } from "react";
 import useHttpClient from "./useHttpClient";
 
 
-const useOrder = () => {
-    const [items, setItems] = useState([]);
-    const [delivery, setDelivery] = useState();
-    const [promoCodes, setPromoCodes] = useState();
+const useOrder = ({customerProfile, basket}) => {    
+    const [delivery, setDelivery] = useState();    
     const [calculatedOrder, setCalculatedOrder] = useState();
-    const {getData} = useHttpClient();
 
-    useEffect(() => {
-        if(!items.length){
-            return setCalculatedOrder(null);
-        }
+    const {getData} = useHttpClient();
+    
+    useEffect(() => { 
         calculateOrder();
-    }, [items, delivery, promoCodes]);
+    }, [basket.items, customerProfile.profile]);
     
 
     const createCalculationRequest = () => {
         return {
-            items: items.map(i => ({productId: `${i.id}`, quantity: i.quantity})),
-            delivery,
-            promoCodes
+            items: basket?.items?.map(i => ({productId: `${i.id}`, quantity: i.quantity})),
+            delivery: customerProfile?.profile?.delivery
         }
     }
 
+    const verifyParameters = () => {
+        return customerProfile.profile && basket.items;
+    }
+
     const calculateOrder = () => {
+        if(!verifyParameters()){
+            setCalculatedOrder(null);
+            return;
+        }
+
         getData('https://localhost:14443/Order/calculate', {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -61,38 +65,23 @@ const useOrder = () => {
         });
     }
 
+    const getOrderSummary = () => {
+        if(!calculatedOrder){
+            return {};
+        }
+        return calculatedOrder.order.orderCalculations.reduce((a, i) => {a[i.typeCode] = i.amount + (a[i.typeCode] ? a[i.typeCode] : 0.0); return a;}, {});        
+    }
+
     return {
-        basket: {
-            items,
-            reload: () => {
-                getData( 'https://localhost:13443/Basket')
-                .then(r => r.json())
-                .then(r => setItems(r))
-            },
-            add: (productId, qty = 1) => {
-                getData(`https://localhost:13443/Basket/add?product=${productId}&qty=${qty}`, {method: 'POST'})
-                .then(r => r.json())
-                .then(r => setItems(r));
-            },
-            set: (productId, qty) => {
-                getData(`https://localhost:13443/Basket/set?product=${productId}&qty=${qty}`, {method: 'POST'})
-                .then(r => r.json())
-                .then(r => setItems(r));
-            },
-            clear: () => {
-                getData(`https://localhost:13443/Basket/clear`, {method: 'POST'})        
-                .then(r => setItems([]));
-            },
-            getPosition: productId => items.find(p => p.id === productId)
-        },
         delivery,
         setDelivery,
-        promoCodes,
-        setPromoCodes,
+        
         calculatedOrder,
         calculateOrder,
+
         getTotalAmount,
-        enumerateOrderItems
+        enumerateOrderItems,
+        getOrderSummary
     }
 }
 

@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Product from "../Product";
 import useHttpClient from "../../hooks/useHttpClient";
 import useAuth from "../../hooks/useAuth";
-import useOrderContext from "../../hooks/useContextOrder";
+import { BasketContext } from "../../context/BasketContext";
 
 
 const Home = () => {  
-  const order = useOrderContext();
+  const {order} = useContext(BasketContext);
   const auth = useAuth();
 
   const [products, setProducts] = useState([]);

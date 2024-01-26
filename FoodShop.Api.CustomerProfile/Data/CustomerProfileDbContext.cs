@@ -11,6 +11,7 @@ public class CustomerProfileDbContext : DbContext
 
     public DbSet<CustomerTokenType> CustomerTokenTypes { get; set; }
     public DbSet<CustomerToken> CustomerTokens { get; set; }
+    public DbSet<CustomerDeliveryInfo> CustomerDeliveryInfos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

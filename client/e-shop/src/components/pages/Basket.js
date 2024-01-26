@@ -1,11 +1,15 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import PlusMinus from "../PlusMinus";
-import useContextOrder from "../../hooks/useContextOrder";
+import { ORDER_CALCULATION_TYPE_CODES } from "../../services/data";
+import { BasketContext } from "../../context/BasketContext";
 
 const Basket = () => {
-    const order = useContextOrder();
+    const {order, customerProfile} = useContext(BasketContext);
     const auth = useAuth();
+
+    
 
     const getUserDisplayName = () => auth.state.userName ? 'Logged in' : 'Anonymous';
 
@@ -20,7 +24,9 @@ const Basket = () => {
     const handleRemoveProduct = (product) => {
         order.basket.set(product.id, 0);
     }
-    
+
+    let orderSummary = order.getOrderSummary();
+
     return (
         <>
             <header className="header">
@@ -73,11 +79,36 @@ const Basket = () => {
                 })}
 
 
-                <div className="row">
-                    <div className="col-md-11 d-flex flex-row-reverse">
+                {Object.keys(orderSummary).map(k => {
+                    return (
+                        <div className="row">
+                            <div className="col-md-9 d-flex flex-row-reverse">                        
+                                <span className="fs-4">{ORDER_CALCULATION_TYPE_CODES[k]?.name ?? k }:</span>
+                            </div> 
+                            <div className="col-md-2 d-flex flex-row-reverse">
+                                <span className="fs-4">£{orderSummary[k].toFixed(2) }</span>
+                            </div>                    
+                        </div> 
+                    )
+                })}
+
+                <div className="row mt-5">
+                    <div className="col-md-9 d-flex flex-row-reverse">                        
+                        <span className="fs-2">Total:</span>
+                    </div> 
+                    <div className="col-md-2 d-flex flex-row-reverse">
                         <span className="fs-2">£{order.getTotalAmount() }</span>
                     </div>                    
                 </div> 
+
+                {customerProfile.profile && (
+                    <div className="row mt-5">
+                        <div className="col-md-6">
+                            {customerProfile.profile.delivery.address}
+                        </div>
+                    </div>
+                )}                
+
                 <div className="row mt-3">
                     <div className="col-md-11 d-flex flex-row-reverse">
                         <button className="basket-button px-5">Checkout</button>

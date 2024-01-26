@@ -1,6 +1,8 @@
 import { createContext, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import useOrder from "../hooks/useOrder";
+import { useCustomerProfile } from "../hooks/useCustomerProfile";
+import { useBasket } from "../hooks/useBasket";
 
 
 export const BasketContext = createContext({});
@@ -8,16 +10,28 @@ export const BasketContext = createContext({});
 
 export const BasketProvider = ({children}) => {    
     const auth = useAuth();    
-    const order = useOrder();
+    const customerProfile = useCustomerProfile();
+    const basket = useBasket();
+    const order = useOrder({customerProfile, basket});
+    
 
     useEffect(() => {
-        console.log('DBG_01');
-        order.basket.reload();
+        Promise.allSettled([
+            basket.fetchData(),
+            customerProfile.fetchData()
+        ]).then(values => {            
+            basket.setItems(values[0].value);
+            customerProfile.setProfile(values[1].value)
+        });
     }, [auth.sync]);
-    
+
        
     return (
-        <BasketContext.Provider value={order}>
+        <BasketContext.Provider value={{
+            order, 
+            customerProfile, 
+            basket
+        }}>
             {children}
         </BasketContext.Provider>
     );

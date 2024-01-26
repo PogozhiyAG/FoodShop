@@ -24,8 +24,10 @@ public class OrderCalculation
 public static class OrderCalculationTypeCodes
 {
     public const string Product = "P";
-    public const string Delivery = "D";
-    public const string Service = "S";
     public const string ProductDiscount = "PD";
-    public const string OrderDiscount = "OD";
+    public const string Delivery = "D";
+    public const string DeliveryDiscount = "DD";
+    public const string Service = "S";
+    public const string ServiceDiscount = "SD";
+    public const string OrderVolumeDiscount = "OVD";
 }
