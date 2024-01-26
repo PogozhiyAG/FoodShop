@@ -34,8 +34,7 @@ public class BasketController : ControllerBase
     {
         //TODO edge case when the basket is empty
         var basket = await EnsureBasket();
-        var calculatedBasket = await GetCalculatedBasket(basket);
-        return Ok(calculatedBasket);
+        return Ok(basket);
     }
 
 
@@ -43,13 +42,9 @@ public class BasketController : ControllerBase
     public async Task<IActionResult> Add(string product, int qty = 1)
     {
         CustomerBasket basket = await EnsureBasket();
-
         basket.Items.AddQuantity(product, qty);
-
         await SaveBasket(basket);
-
-        var calculatedBasket = await GetCalculatedBasket(basket);
-        return Ok(calculatedBasket);
+        return Ok(basket);
     }
 
 
@@ -57,13 +52,9 @@ public class BasketController : ControllerBase
     public async Task<IActionResult> Set(string product, int qty)
     {
         CustomerBasket basket = await EnsureBasket();
-
         basket.Items.SetQuantity(product, qty);
-
         await SaveBasket(basket);
-
-        var calculatedBasket = await GetCalculatedBasket(basket);
-        return Ok(calculatedBasket);
+        return Ok(basket);
     }
 
 

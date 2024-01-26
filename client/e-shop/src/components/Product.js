@@ -16,7 +16,7 @@ const Product = ({product}) => {
         basket.add(product.id, -1);
     }
 
-    const basketQuantity = basket.getPosition(product.id)?.quantity;  
+    const basketQuantity = basket.getPosition(product.id);  
     
     const imageSrc = `food${product.id % 10}.jpg`;
 

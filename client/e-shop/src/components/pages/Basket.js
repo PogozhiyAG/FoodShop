@@ -6,7 +6,7 @@ import { ORDER_CALCULATION_TYPE_CODES } from "../../services/data";
 import { BasketContext } from "../../context/BasketContext";
 
 const Basket = () => {
-    const {order, customerProfile} = useContext(BasketContext);
+    const {basket, order, customerProfile} = useContext(BasketContext);
     const auth = useAuth();
 
     
@@ -14,15 +14,15 @@ const Basket = () => {
     const getUserDisplayName = () => auth.state.userName ? 'Logged in' : 'Anonymous';
 
     const handleAddToBasket = (product) => {
-        order.basket.add(product.id, 1);
+        basket.add(product.id, 1);
     }
 
     const handleRemoveFromBasket = (product) => {
-        order.basket.add(product.id, -1);
+        basket.add(product.id, -1);
     }
 
     const handleRemoveProduct = (product) => {
-        order.basket.set(product.id, 0);
+        basket.set(product.id, 0);
     }
 
     let orderSummary = order.getOrderSummary();
@@ -101,7 +101,7 @@ const Basket = () => {
                     </div>                    
                 </div> 
 
-                {customerProfile.profile && (
+                {customerProfile.profile?.delivery && (
                     <div className="row mt-5">
                         <div className="col-md-6">
                             {customerProfile.profile.delivery.address}

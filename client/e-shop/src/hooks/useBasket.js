@@ -2,7 +2,7 @@ import { useState } from "react";
 import useHttpClient from "./useHttpClient";
 
 export const useBasket = () => {
-    const [items, setItems] = useState();
+    const [basket, setBasket] = useState();
 
     const {getData} = useHttpClient();
 
@@ -12,27 +12,27 @@ export const useBasket = () => {
     
     const reload = () =>
         fetchData()
-        .then(r => setItems(r));
+        .then(r => setBasket(r));
     
     const add = (productId, qty = 1) =>
         getData(`https://localhost:13443/Basket/add?product=${productId}&qty=${qty}`, {method: 'POST'})
         .then(r => r.json())
-        .then(r => setItems(r));
+        .then(r => setBasket(r));
 
     const set = (productId, qty) =>
         getData(`https://localhost:13443/Basket/set?product=${productId}&qty=${qty}`, {method: 'POST'})
         .then(r => r.json())
-        .then(r => setItems(r));
+        .then(r => setBasket(r));
 
     const clear = () =>
         getData(`https://localhost:13443/Basket/clear`, {method: 'POST'})        
-        .then(r => setItems([]));
+        .then(r => setBasket([]));
 
-    const getPosition = productId => items?.find(p => p.id === productId);
+    const getPosition = productId => basket?.items[productId];
 
     return {
-        items,
-        setItems,
+        basket,
+        setBasket,
         fetchData,
         reload,
         add,

@@ -11,18 +11,18 @@ const useOrder = ({customerProfile, basket}) => {
     
     useEffect(() => { 
         calculateOrder();
-    }, [basket.items, customerProfile.profile]);
+    }, [basket.basket, customerProfile.profile]);
     
 
     const createCalculationRequest = () => {
         return {
-            items: basket?.items?.map(i => ({productId: `${i.id}`, quantity: i.quantity})),
-            delivery: customerProfile?.profile?.delivery
+            items: Object.keys(basket.basket?.items).map(k => ({productId: `${k}`, quantity: basket.basket.items[k]})),
+            delivery: customerProfile.profile?.delivery
         }
     }
 
     const verifyParameters = () => {
-        return customerProfile.profile && basket.items;
+        return customerProfile.profile && basket.basket;
     }
 
     const calculateOrder = () => {

@@ -20,7 +20,7 @@ export const BasketProvider = ({children}) => {
             basket.fetchData(),
             customerProfile.fetchData()
         ]).then(values => {            
-            basket.setItems(values[0].value);
+            basket.setBasket(values[0].value);
             customerProfile.setProfile(values[1].value)
         });
     }, [auth.sync]);

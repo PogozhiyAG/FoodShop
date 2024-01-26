@@ -30,6 +30,7 @@ public class CustomerProfileController : ControllerBase
         var delivery = await _db.CustomerDeliveryInfos.AsNoTracking()
             .Where(p => p.UserName == userName)
             .FirstOrDefaultAsync();
+        //TODO: Refactoring
         var tokenTypes = await _db.CustomerTokens.AsNoTracking()
             .Where(x => x.UserName == userName)
             .Where(t => t.ValidFrom <= moment && (t.ValidTo == null || t.ValidTo > moment))
@@ -50,7 +51,7 @@ public class CustomerProfileController : ControllerBase
     public async Task<IActionResult> GetValidTokenTypes(string userName)
     {
         var moment = DateTime.Now;
-
+        //TODO: Refactoring
         var result = await _db.CustomerTokens.AsNoTracking()
             .Where(x => x.UserName == userName)
             .Where(t => t.ValidFrom <= moment && (t.ValidTo == null || t.ValidTo > moment))
