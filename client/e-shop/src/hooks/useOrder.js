@@ -87,6 +87,8 @@ const useOrder = ({customerProfile, basket}) => {
         calculatedOrder,
         calculateOrder,
 
+        createCalculationRequest,
+
         getTotalAmount,
         enumerateOrderItems,
         getOrderSummary

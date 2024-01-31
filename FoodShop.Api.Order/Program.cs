@@ -6,6 +6,7 @@ using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Services;
 using FoodShop.Api.Order.Services.Calculation;
 using FoodShop.Api.Order.Services.Calculation.Stage;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,11 @@ builder.Services.AddKeyedScoped<IOrderCalculationStage, ProductCalculationStage>
 builder.Services.AddKeyedScoped<IOrderCalculationStage, PackingServiceCalculationStage>(PackingServiceCalculationStage.DEFAULT_SERVICE_KEY);
 builder.Services.AddKeyedScoped<IOrderCalculationStage, DeliveryCalculationStage>(DeliveryCalculationStage.DEFAULT_SERVICE_KEY);
 builder.Services.AddKeyedScoped<IOrderCalculationStage, CorrectionCalculationStage>(CorrectionCalculationStage.DEFAULT_SERVICE_KEY);
+
+
+//Stripe services
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
+builder.Services.AddTransient<PaymentIntentService>();
 
 
 

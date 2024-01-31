@@ -16,7 +16,7 @@ namespace FoodShop.Api.Order.Controllers;
 [Route("[controller]")]
 public class OrderController : ControllerBase
 {
-    IDbContextFactory<OrderDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<OrderDbContext> _dbContextFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IOrderCalculator _orderCalculator;
     private readonly IProductCatalog _productCatalog;

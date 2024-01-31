@@ -19,8 +19,7 @@ public class OrderDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Model.Order>().HasIndex(o => o.UserId);
-
+        modelBuilder.Entity<Model.Order>().HasIndex("UserId", "Status");
         modelBuilder.Entity<OrderCalculationProperty>().HasKey("OrderCalculationId", "Name");
     }
 }

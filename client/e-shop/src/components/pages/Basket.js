@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import PlusMinus from "../PlusMinus";
 import { ORDER_CALCULATION_TYPE_CODES } from "../../services/data";
@@ -8,7 +8,7 @@ import { BasketContext } from "../../context/BasketContext";
 const Basket = () => {
     const {basket, order, customerProfile} = useContext(BasketContext);
     const auth = useAuth();
-
+    const navigate = useNavigate();
     
 
     const getUserDisplayName = () => auth.state.userName ? 'Logged in' : 'Anonymous';
@@ -23,6 +23,10 @@ const Basket = () => {
 
     const handleRemoveProduct = (product) => {
         basket.set(product.id, 0);
+    }
+
+    const handleCheckoutClick = () => {
+        navigate('/checkout');
     }
 
     let orderSummary = order.getOrderSummary();
@@ -111,7 +115,7 @@ const Basket = () => {
 
                 <div className="row mt-3">
                     <div className="col-md-11 d-flex flex-row-reverse">
-                        <button className="basket-button px-5">Checkout</button>
+                        <button onClick={handleCheckoutClick} className="basket-button px-5">Checkout</button>
                     </div>                    
                 </div>
             </main>

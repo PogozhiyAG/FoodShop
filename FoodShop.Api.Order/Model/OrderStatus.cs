@@ -4,6 +4,7 @@ public enum OrderStatus
 {
     Draft,
     Created,
+    Checkout,
     Confirmed,
     Paid,
     Delivery,
