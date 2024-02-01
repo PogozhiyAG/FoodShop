@@ -48,6 +48,8 @@ namespace FoodShop.Api.Order.Controllers
                 orderDbContext.Orders.RemoveRange(existingCheckoutOrders);
             }
 
+            await orderDbContext.SaveChangesAsync();
+
             var order = createOrderRequest.ToOrder(o =>
             {
                 o.Status = OrderStatus.Checkout;

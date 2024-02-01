@@ -4,6 +4,7 @@ import Product from "../Product";
 import useHttpClient from "../../hooks/useHttpClient";
 import useAuth from "../../hooks/useAuth";
 import { BasketContext } from "../../context/BasketContext";
+import { useThrottling } from "../../hooks/useThrottling";
 
 
 const Home = () => {  
@@ -16,6 +17,7 @@ const Home = () => {
   
   const {getData} = useHttpClient();
 
+  const throttle = useThrottling({key: 'Catalog', delay: 100});
 
 
   const getUserDisplayName = () => auth.state.userName ? 'Logged in' : 'Anonymous';
@@ -31,9 +33,11 @@ const Home = () => {
 
 
   useEffect(() => {
-    getData(getDataUrl())
-    .then(async r => {
-      setProducts(await r.json());
+    throttle(() => {
+      getData(getDataUrl())      
+      .then(async r => {
+        setProducts(await r.json());
+      });
     });
   }, [searchText, sortOrder]);
 

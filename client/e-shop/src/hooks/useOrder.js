@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useHttpClient from "./useHttpClient";
 import useAuth from "./useAuth";
+import { useThrottling } from "./useThrottling";
 
 
 const useOrder = ({customerProfile, basket}) => {  
@@ -9,13 +10,17 @@ const useOrder = ({customerProfile, basket}) => {
 
     const {getData} = useHttpClient();
 
+    const throttleAuth = useThrottling({key: 'BasketAndProfileReload', delay: 100});
+
     useEffect(() => {
-        Promise.allSettled([
-            basket.fetchData(),
-            customerProfile.fetchData()
-        ]).then(values => {            
-            basket.setBasket(values[0].value);
-            customerProfile.setProfile(values[1].value)
+        throttleAuth(() => {
+            Promise.allSettled([
+                basket.fetchData(),
+                customerProfile.fetchData()
+            ]).then(values => {            
+                basket.setBasket(values[0].value);
+                customerProfile.setProfile(values[1].value)
+            });
         });
     }, [auth.sync]);
 
