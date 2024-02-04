@@ -15,8 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Catalog", "Foo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6EC74503-F7F6-4C9E-957E-08CA90F2BC70}"
 	ProjectSection(SolutionItems) = preProject
-		ngrock.bat = ngrock.bat
 		sqlserver-fulltext.Dockerfile = sqlserver-fulltext.Dockerfile
+		ngrok.bat = ngrok.bat
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Auth", "FoodShop.Api.Auth\FoodShop.Api.Auth.csproj", "{7E77F860-80EF-4115-97E2-2F7ED3CB2526}"
