@@ -15,6 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Catalog", "Foo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6EC74503-F7F6-4C9E-957E-08CA90F2BC70}"
 	ProjectSection(SolutionItems) = preProject
+		ngrock.bat = ngrock.bat
 		sqlserver-fulltext.Dockerfile = sqlserver-fulltext.Dockerfile
 	EndProjectSection
 EndProject
@@ -24,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.CustomerProfil
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Basket", "FoodShop.Api.Basket\FoodShop.Api.Basket.csproj", "{EED8B341-01DB-407F-B51F-38FB62C3FE68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodShop.Api.Order", "FoodShop.Api.Order\FoodShop.Api.Order.csproj", "{B27F6ADD-0A5D-40DF-87AF-7F56C945749D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Order", "FoodShop.Api.Order\FoodShop.Api.Order.csproj", "{B27F6ADD-0A5D-40DF-87AF-7F56C945749D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

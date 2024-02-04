@@ -1,7 +1,5 @@
 ﻿using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Services.Calculation;
-using FoodShop.Api.Order.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
@@ -19,20 +17,17 @@ namespace FoodShop.Api.Order.Controllers
         private readonly IDbContextFactory<OrderDbContext> _dbContextFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOrderCalculator _orderCalculator;
-        private readonly IProductCatalog _productCatalog;
 
-        public PaymentIntentController(PaymentIntentService paymentIntentService, IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator, IProductCatalog productCatalog)
+        public PaymentIntentController(PaymentIntentService paymentIntentService, IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator)
         {
             _paymentIntentService = paymentIntentService;
             _dbContextFactory = dbContextFactory;
             _httpContextAccessor = httpContextAccessor;
             _orderCalculator = orderCalculator;
-            _productCatalog = productCatalog;
         }
 
 
         private string GetUserName() => _httpContextAccessor.HttpContext!.User.Identity!.Name!;
-
 
 
         [HttpPost]
@@ -42,13 +37,12 @@ namespace FoodShop.Api.Order.Controllers
 
             using var orderDbContext = _dbContextFactory.CreateDbContext();
 
-            var existingCheckoutOrders = orderDbContext.Orders.Where(o => o.UserId == userName && o.Status == OrderStatus.Checkout).ToList();
+            var existingCheckoutOrders = await orderDbContext.Orders.Where(o => o.UserId == userName && o.Status == OrderStatus.Checkout).ToListAsync();
             if(existingCheckoutOrders.Count > 0)
             {
                 orderDbContext.Orders.RemoveRange(existingCheckoutOrders);
+                await orderDbContext.SaveChangesAsync();
             }
-
-            await orderDbContext.SaveChangesAsync();
 
             var order = createOrderRequest.ToOrder(o =>
             {

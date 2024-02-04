@@ -49,7 +49,6 @@ StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
 builder.Services.AddTransient<PaymentIntentService>();
 
 
-
 var app = builder.Build();
 
 app.UseCors("AllowAll");
