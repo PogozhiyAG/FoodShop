@@ -26,9 +26,9 @@ export const useBasket = () => {
 
     const clear = () =>
         getData(`https://localhost:13443/Basket/clear`, {method: 'POST'})        
-        .then(r => setBasket([]));
+        .then(r => setBasket({}));
 
-    const getPosition = productId => basket?.items[productId];
+    const getPosition = productId => basket?.items?.[productId];
 
     return {
         basket,

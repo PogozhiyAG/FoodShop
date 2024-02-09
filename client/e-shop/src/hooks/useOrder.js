@@ -47,7 +47,7 @@ const useOrder = ({customerProfile, basket}) => {
             return;
         }
 
-        getData('https://localhost:14443/Order/calculate', {
+        return getData('https://localhost:14443/Order/calculate', {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(createCalculationRequest())

@@ -9,9 +9,10 @@ import Login from './components/pages/Login';
 import Basket from './components/pages/Basket';
 import Category from './components/pages/Category';
 import NoPage from './components/pages/NoPage';
+import { Checkout } from './components/pages/Checkout';
+import { CheckoutComplete } from './components/pages/CheckoutComplete';
 
 import './App.css';
-import { Checkout } from './components/pages/Checkout';
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
             <Route path="category/*" element={<Category />} />              
             <Route path="basket" element={<Basket />} />
             <Route path="checkout" element={<Checkout />} />
+            <Route path='checkoutcomplete' element={<CheckoutComplete/>} />
             <Route path="login" element={<Login />} />
             <Route path="*" element={<NoPage />} />
           </Routes>
