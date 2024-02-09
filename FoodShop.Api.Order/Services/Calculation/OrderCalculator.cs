@@ -29,7 +29,7 @@ public class OrderCalculator : IOrderCalculator
             Order = order
         };
 
-        var stageKeys = _configuration["OrderCalculator:Stages"].Split(",", StringSplitOptions.RemoveEmptyEntries);
+        var stageKeys = _configuration["OrderCalculator:Stages"]?.Split(",", StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var stageKey in stageKeys)
         {

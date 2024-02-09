@@ -29,20 +29,13 @@ namespace FoodShop.Api.Order.Controllers
 
         private string GetUserName() => _httpContextAccessor.HttpContext!.User.Identity!.Name!;
 
-
+        //TODO: carefully process existing order(s) case
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOrderRequest createOrderRequest)
         {
             var userName = GetUserName();
+            using var orderDbContext = await _dbContextFactory.CreateDbContextAsync();
 
-            using var orderDbContext = _dbContextFactory.CreateDbContext();
-
-            var existingCheckoutOrders = await orderDbContext.Orders.Where(o => o.UserId == userName && o.Status == OrderStatus.Checkout).ToListAsync();
-            if(existingCheckoutOrders.Count > 0)
-            {
-                orderDbContext.Orders.RemoveRange(existingCheckoutOrders);
-                await orderDbContext.SaveChangesAsync();
-            }
 
             var order = createOrderRequest.ToOrder(o =>
             {
@@ -51,9 +44,7 @@ namespace FoodShop.Api.Order.Controllers
             });
 
             var result = await _orderCalculator.CalculateOrder(order);
-
             orderDbContext.Add(order);
-
             await orderDbContext.SaveChangesAsync();
 
             var amount = Convert.ToInt64(Math.Round(order.OrderCalculations.Sum(c => c.Amount) * 100));
@@ -63,6 +54,13 @@ namespace FoodShop.Api.Order.Controllers
                 Amount = amount,
                 Currency = "gbp"
             });
+
+            var orderPaymentIntent = new OrderPaymentIntent() {
+                Order = order,
+                PaymentIntentId = paymentIntent.Id,
+            };
+            orderDbContext.Add(orderPaymentIntent);
+            await orderDbContext.SaveChangesAsync();
 
             return Ok(new { paymentIntent.ClientSecret });
         }

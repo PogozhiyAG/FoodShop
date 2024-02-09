@@ -44,6 +44,7 @@ export const Checkout = () => {
     return (
         <>
             <h1>Checkout</h1>
+            <h2>£{order.getTotalAmount() }</h2>
             {clientSecret 
                 ? (
                     <Elements options={options} stripe={stripePromise}>
