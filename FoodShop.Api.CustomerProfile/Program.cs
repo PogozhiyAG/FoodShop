@@ -1,8 +1,6 @@
-using FoodShop.Api.CustomerProfile.Configuration;
 using FoodShop.Api.CustomerProfile.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using FoodShop.BuildingBlocks.Configuration.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,19 +9,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddDbContext<CustomerProfileDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJWTBearerOptions>();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer();
+builder.Services.AddFoodShopJwt();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 
 
 var app = builder.Build();

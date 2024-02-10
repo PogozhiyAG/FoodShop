@@ -1,11 +1,9 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
-using FoodShop.Api.Order.Configuration;
 using Microsoft.EntityFrameworkCore;
 using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Services;
 using FoodShop.Api.Order.Services.Calculation;
 using FoodShop.Api.Order.Services.Calculation.Stage;
+using FoodShop.BuildingBlocks.Configuration.Security;
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,14 +16,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddDbContextFactory<OrderDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJWTBearerOptions>();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer();
+builder.Services.AddFoodShopJwt();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

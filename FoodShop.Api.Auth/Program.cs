@@ -1,11 +1,8 @@
-using FoodShop.Api.Auth.Configuration;
 using FoodShop.Api.Auth.Data;
 using FoodShop.Api.Auth.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.Security.Cryptography;
+using FoodShop.BuildingBlocks.Configuration.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,16 +17,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-
-builder.Services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJWTBearerOptions>();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer();
-
+builder.Services.AddFoodShopJwt();
 
 
 var app = builder.Build();

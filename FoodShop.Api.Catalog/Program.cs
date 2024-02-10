@@ -1,9 +1,7 @@
-using FoodShop.Api.Catalog.Configuration;
 using FoodShop.Api.Catalog.Services;
+using FoodShop.BuildingBlocks.Configuration.Security;
 using FoodShop.Infrastructure.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,14 +18,7 @@ builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().Al
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJWTBearerOptions>();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer();
+builder.Services.AddFoodShopJwt();
 
 builder.Services.AddDbContextFactory<FoodShopDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
