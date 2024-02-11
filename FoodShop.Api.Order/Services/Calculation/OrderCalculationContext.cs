@@ -29,7 +29,6 @@ public class OrderCalculationContext
     public decimal SumOf(params string[] typeCodes) =>
         Order.OrderCalculations
             .Where(r => typeCodes.Contains(r.TypeCode))
-            .Select(i => i.Amount)
-            .Sum();
+            .Sum(i => i.Amount);
 
 }

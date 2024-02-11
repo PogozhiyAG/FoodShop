@@ -13,6 +13,11 @@ public class DeliveryCalculationStage : IOrderCalculationStage
             return Array.Empty<OrderCalculation>();
         }
 
+        if (orderCalculationContext.Order.Items.Count == 0)
+        {
+            return Array.Empty<OrderCalculation>();
+        }
+
         return new OrderCalculation[] { orderCalculationContext.CreateCalculation(c => {
             c.TypeCode = OrderCalculationTypeCodes.Delivery;
             //TODO: from DB or delivery service
