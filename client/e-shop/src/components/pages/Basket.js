@@ -85,7 +85,7 @@ const Basket = () => {
 
                 {Object.keys(orderSummary).map(k => {
                     return (
-                        <div className="row">
+                        <div className="row" key={k}>
                             <div className="col-md-9 d-flex flex-row-reverse">                        
                                 <span className="fs-4">{ORDER_CALCULATION_TYPE_CODES[k]?.name ?? k }:</span>
                             </div> 

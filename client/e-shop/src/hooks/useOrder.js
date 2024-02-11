@@ -11,6 +11,7 @@ const useOrder = ({customerProfile, basket}) => {
     const {getData} = useHttpClient();
 
     const throttleAuth = useThrottling({key: 'BasketAndProfileReload', delay: 100});
+    const throttleCalculate = useThrottling({key: 'CalculateOrder', delay: 100});
 
     useEffect(() => {
         throttleAuth(() => {
@@ -25,8 +26,10 @@ const useOrder = ({customerProfile, basket}) => {
     }, [auth.sync]);
 
 
-    useEffect(() => { 
-        calculateOrder();
+    useEffect(() => {
+        throttleCalculate(() => {            
+            calculateOrder();
+        });
     }, [basket.basket, customerProfile.profile]);
     
 
@@ -41,12 +44,12 @@ const useOrder = ({customerProfile, basket}) => {
         return customerProfile.profile && basket.basket;
     }
 
-    const calculateOrder = () => {
+    const calculateOrder = () => {        
         if(!verifyParameters()){
             setCalculatedOrder(null);
             return;
         }
-
+        
         return getData('https://localhost:14443/Order/calculate', {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
