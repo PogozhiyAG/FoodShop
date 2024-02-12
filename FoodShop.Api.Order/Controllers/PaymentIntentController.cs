@@ -33,14 +33,12 @@ namespace FoodShop.Api.Order.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOrderRequest createOrderRequest)
         {
-            var userName = GetUserName();
             using var orderDbContext = await _dbContextFactory.CreateDbContextAsync();
-
 
             var order = createOrderRequest.ToOrder(o =>
             {
                 o.Status = OrderStatus.Checkout;
-                o.UserId = userName;
+                o.UserId = GetUserName();
             });
 
             var result = await _orderCalculator.CalculateOrder(order);

@@ -23,9 +23,6 @@ public class StripeWebHookController : ControllerBase
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         var stripeEvent = EventUtility.ParseEvent(json, false);
 
-        //TODO: logging
-        Console.WriteLine("Event received: {0}", stripeEvent.Type);
-
         //TODO: add flexibility
         if (stripeEvent.Type == StripeEventTypes.PAYMENT_INTENT_SUCCEEDED)
         {
