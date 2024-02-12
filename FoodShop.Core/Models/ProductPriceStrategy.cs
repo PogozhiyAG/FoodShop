@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoodShop.Core.Models
 {
+    //TODO: compile calculation delegate from string
     public class ProductPriceStrategy : EntityBase
     {
         public static ProductPriceStrategy Default { get; } = new() { Name = "Default", Quantity = 1, Rate = 1.0M };
