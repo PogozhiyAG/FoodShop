@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddGrpc();
+builder.Services.AddGrpcReflection();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
@@ -24,6 +26,7 @@ builder.Services.AddDbContextFactory<FoodShopDbContext>(options => options.UseSq
 
 builder.Services.AddSingleton<IProductPriceStrategyProvider, ProductPriceStrategyProvider>();
 builder.Services.AddScoped<ICustomerProfile, CustomerProfile>();
+builder.Services.AddScoped<IUserTokenTypesProvider, HttpContextUserTokenTypesProvider>();
 
 
 var app = builder.Build();
@@ -46,5 +49,7 @@ app.UseAuthorization();
 
 
 app.MapControllers();
+app.MapGrpcService<ProductCalculatorGrpcService>();
+app.MapGrpcReflectionService();
 
 app.Run();

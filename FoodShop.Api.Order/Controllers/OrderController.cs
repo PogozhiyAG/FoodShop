@@ -5,9 +5,14 @@ using FoodShop.Api.Order.Model;
 using FoodShop.Api.Order.Model.Extensions;
 using FoodShop.Api.Order.Services;
 using FoodShop.Api.Order.Services.Calculation;
+using FoodShop.Catalog.Grpc;
+using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Threading.Channels;
 
 namespace FoodShop.Api.Order.Controllers;
 
@@ -88,6 +93,32 @@ public class OrderController : ControllerBase
 
         var result = await _orderCalculator.CalculateOrder(order);
         return Ok(result);
+    }
+
+    [HttpGet("grpctest")]
+    public async Task<IActionResult> GrpcTest()
+    {
+        //using var channel = GrpcChannel.ForAddress("http://foodshop.api.catalog:90");
+        //var client = new Greeter.GreeterClient(channel);
+        //var headers = new Metadata();
+
+        //var auth = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();
+        //if (auth != null)
+        //{
+        //    headers.Add("Authorization", auth);
+        //}
+
+        //var sw = Stopwatch.StartNew();
+        //var reply = await client.SayHelloAsync(new HelloRequest() { Name = "USER_NAME" }, headers: headers);
+        //sw.Stop();
+        //var elapsed1 = sw.Elapsed;
+
+        //sw = Stopwatch.StartNew();
+        //reply = await client.SayHelloAsync(new HelloRequest() { Name = "USER_NAME_TWO" }, headers: headers);
+        //sw.Stop();
+
+        //return Ok($"{reply.Message}. Takes #1:{elapsed1} #2: {sw.Elapsed}");
+        return Ok();
     }
 }
 

@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option csharp_namespace = "FoodShop.Catalog.Grpc";
+
+package FoodShop.Catalog;
+
+
+service ProductCalculator {
+    rpc Calculate (ProductCalculationRequest) returns (ProductCalculationResponse);
+}
+
+message ProductCalculationRequestItem{
+    int32 ProductId = 1;
+    int32 Quantity = 2;
+}
+
+message ProductCalculationRequest{
+    repeated ProductCalculationRequestItem Items = 1;
+}
+
+message NamedEntity {
+    int32 Id = 1;
+    string Name = 2;
+}
+
+message ProductCalculationResponseItem {
+    int32 Id = 1;
+    string Name = 2;
+    string Description = 3;
+    NamedEntity Brand = 4;
+    NamedEntity Category = 5;
+    optional string ImageUri = 6;
+    int32 Popularity = 7;
+    int32 CustomerRating = 8;
+    int32 Price = 9;
+    repeated string Tags = 10;
+    optional string TokenTypeCode = 11;
+    optional string StrategyName = 12;
+    int32 OfferPrice = 13;
+    int32 Quantity = 14;
+    int32 Amount = 15;
+    int32 OfferAmount = 16;
+}
+
+message ProductCalculationResponse {
+    repeated ProductCalculationResponseItem Items = 1;
+}

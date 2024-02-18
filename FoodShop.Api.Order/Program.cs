@@ -5,6 +5,8 @@ using FoodShop.Api.Order.Services.Calculation;
 using FoodShop.Api.Order.Services.Calculation.Stage;
 using FoodShop.BuildingBlocks.Configuration.Security;
 using Stripe;
+using FoodShop.Catalog.Grpc;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +25,8 @@ builder.Services.AddSwaggerGen();
 
 
 
-builder.Services.AddScoped<IProductCatalog, ProductCatalog>();
+//builder.Services.AddScoped<IProductCatalog, ProductCatalog>();
+builder.Services.AddScoped<IProductCatalog, ProductCatalogGrpc>();
 builder.Services.AddScoped<IOrderCalculator, OrderCalculator>();
 builder.Services.AddScoped<ICustomerProfile, CustomerProfile>();
 
@@ -33,6 +36,30 @@ builder.Services.AddKeyedScoped<IOrderCalculationStage, ProductCalculationStage>
 builder.Services.AddKeyedScoped<IOrderCalculationStage, PackingServiceCalculationStage>(PackingServiceCalculationStage.DEFAULT_SERVICE_KEY);
 builder.Services.AddKeyedScoped<IOrderCalculationStage, DeliveryCalculationStage>(DeliveryCalculationStage.DEFAULT_SERVICE_KEY);
 builder.Services.AddKeyedScoped<IOrderCalculationStage, CorrectionCalculationStage>(CorrectionCalculationStage.DEFAULT_SERVICE_KEY);
+
+
+
+//gRPC
+//TODO Extension method
+builder.Services
+    .AddGrpcClient<ProductCalculator.ProductCalculatorClient>(o =>
+    {
+        o.Address = new Uri(builder.Configuration["ApiUrls:FoodShop.Api.Catalog.Grpc"]!);
+    })
+    .AddCallCredentials((context, metadata, sp) =>
+    {
+        var _httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+        var auth = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();
+        if (auth != null)
+        {
+            metadata.Add(HeaderNames.Authorization, auth);
+        }
+        return Task.CompletedTask;
+    })
+    .ConfigureChannel(o =>
+    {
+        o.UnsafeUseInsecureChannelCallCredentials = true;
+    });
 
 
 //Stripe services

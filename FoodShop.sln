@@ -15,8 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Catalog", "Foo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6EC74503-F7F6-4C9E-957E-08CA90F2BC70}"
 	ProjectSection(SolutionItems) = preProject
-		sqlserver-fulltext.Dockerfile = sqlserver-fulltext.Dockerfile
 		ngrok.bat = ngrok.bat
+		sqlserver-fulltext.Dockerfile = sqlserver-fulltext.Dockerfile
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Auth", "FoodShop.Api.Auth\FoodShop.Api.Auth.csproj", "{7E77F860-80EF-4115-97E2-2F7ED3CB2526}"
@@ -28,6 +28,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Order", "FoodShop.Api.Order\FoodShop.Api.Order.csproj", "{B27F6ADD-0A5D-40DF-87AF-7F56C945749D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.BuildingBlocks.Configuration.Security", "FoodShop.BuildingBlocks.Configuration.Security\FoodShop.BuildingBlocks.Configuration.Security.csproj", "{13B9A7FC-8DBF-4319-977F-72EFE6C7A92E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Proto", "Proto", "{155985A4-467C-40B1-BDBC-A3430756C431}"
+	ProjectSection(SolutionItems) = preProject
+		proto\catalog.proto = proto\catalog.proto
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +83,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{155985A4-467C-40B1-BDBC-A3430756C431} = {6EC74503-F7F6-4C9E-957E-08CA90F2BC70}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {84D82C2B-3D97-4323-B0D3-A14E75EAE9C5}

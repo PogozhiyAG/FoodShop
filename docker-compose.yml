@@ -54,6 +54,7 @@ services:
     ports:
       - "10080:80"
       - "10443:443"
+      - "10090:90"
     networks:
       - foodshopnetwork
 
