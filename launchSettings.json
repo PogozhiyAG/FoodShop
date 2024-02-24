@@ -12,6 +12,7 @@
             "foodshop.api.basket": "StartDebugging",
             "foodshop.api.order": "StartDebugging",
             "foodshop.api.customerprofile": "StartDebugging",
+            "foodshop.api.warehouse": "StartDebugging",
             "sqldata": "StartWithoutDebugging",
             "basketdata": "StartWithoutDebugging",
             "messaging": "StartWithoutDebugging"
