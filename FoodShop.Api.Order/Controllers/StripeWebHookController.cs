@@ -1,7 +1,9 @@
 ﻿using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Stripe;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FoodShop.MessageContracts.Order;
 using Stripe;
 
 namespace FoodShop.Api.Order.Controllers;
@@ -11,10 +13,12 @@ namespace FoodShop.Api.Order.Controllers;
 public class StripeWebHookController : ControllerBase
 {
     private readonly IDbContextFactory<OrderDbContext> _dbContextFactory;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public StripeWebHookController(IDbContextFactory<OrderDbContext> dbContextFactory)
+    public StripeWebHookController(IDbContextFactory<OrderDbContext> dbContextFactory, IPublishEndpoint publishEndpoint)
     {
         _dbContextFactory = dbContextFactory;
+        _publishEndpoint = publishEndpoint;
     }
 
     [HttpPost]
@@ -38,6 +42,11 @@ public class StripeWebHookController : ControllerBase
                 {
                     orderPaymentIntent.Order.Status = Model.OrderStatus.Paid;
                     await db.SaveChangesAsync();
+
+                    await _publishEndpoint.Publish(new OrderPaid(
+                        OrderId: orderPaymentIntent.Order.Id,
+                        Moment: DateTime.Now
+                    ));
                 }
             }
         }

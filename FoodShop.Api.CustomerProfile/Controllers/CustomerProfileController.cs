@@ -47,6 +47,7 @@ public class CustomerProfileController : ControllerBase
         return Ok(result);
     }
 
+    //TODO: user from auth
     [HttpGet("valid-token-types/{userName}")]
     public async Task<IActionResult> GetValidTokenTypes(string userName)
     {

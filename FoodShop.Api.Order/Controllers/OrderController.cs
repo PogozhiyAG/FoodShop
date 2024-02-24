@@ -94,31 +94,5 @@ public class OrderController : ControllerBase
         var result = await _orderCalculator.CalculateOrder(order);
         return Ok(result);
     }
-
-    [HttpGet("grpctest")]
-    public async Task<IActionResult> GrpcTest()
-    {
-        //using var channel = GrpcChannel.ForAddress("http://foodshop.api.catalog:90");
-        //var client = new Greeter.GreeterClient(channel);
-        //var headers = new Metadata();
-
-        //var auth = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();
-        //if (auth != null)
-        //{
-        //    headers.Add("Authorization", auth);
-        //}
-
-        //var sw = Stopwatch.StartNew();
-        //var reply = await client.SayHelloAsync(new HelloRequest() { Name = "USER_NAME" }, headers: headers);
-        //sw.Stop();
-        //var elapsed1 = sw.Elapsed;
-
-        //sw = Stopwatch.StartNew();
-        //reply = await client.SayHelloAsync(new HelloRequest() { Name = "USER_NAME_TWO" }, headers: headers);
-        //sw.Stop();
-
-        //return Ok($"{reply.Message}. Takes #1:{elapsed1} #2: {sw.Elapsed}");
-        return Ok();
-    }
 }
 

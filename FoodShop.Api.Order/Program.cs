@@ -7,9 +7,13 @@ using FoodShop.BuildingBlocks.Configuration.Security;
 using Stripe;
 using FoodShop.Catalog.Grpc;
 using Microsoft.Net.Http.Headers;
+using MassTransit;
+using RabbitMQ.Client;
+
+//Is this a bug? https://stackoverflow.com/questions/65706167/weird-no-ip-address-could-be-resolved-in-rabbitmq-net-client
+ConnectionFactory.DefaultAddressFamily = System.Net.Sockets.AddressFamily.InterNetwork;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
@@ -17,6 +21,20 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddDbContextFactory<OrderDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddMassTransit(c =>
+{
+    c.UsingRabbitMq((context, configurator) =>
+    {
+        configurator.Host(builder.Configuration["RabbitMq:Host"], builder.Configuration["RabbitMq:VirtualHost"], h =>
+        {
+            h.Username(builder.Configuration["RabbitMq:Username"]);
+            h.Password(builder.Configuration["RabbitMq:Password"]);
+        });
+        configurator.ConfigureEndpoints(context);
+
+    });
+});
 
 builder.Services.AddFoodShopJwt();
 
