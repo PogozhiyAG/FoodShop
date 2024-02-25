@@ -36,6 +36,8 @@ builder.Services.AddMassTransit(c =>
     });
 });
 
+builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<Program>());
+
 builder.Services.AddFoodShopJwt();
 
 builder.Services.AddEndpointsApiExplorer();

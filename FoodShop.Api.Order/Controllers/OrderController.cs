@@ -1,4 +1,5 @@
-﻿using FoodShop.Api.Order.Data;
+﻿using FoodShop.Api.Order.Commands;
+using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Dto;
 using FoodShop.Api.Order.Dto.Extensions;
 using FoodShop.Api.Order.Model;
@@ -8,6 +9,7 @@ using FoodShop.Api.Order.Services.Calculation;
 using FoodShop.Catalog.Grpc;
 using Grpc.Core;
 using Grpc.Net.Client;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,14 +25,14 @@ public class OrderController : ControllerBase
 {
     private readonly IDbContextFactory<OrderDbContext> _dbContextFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IOrderCalculator _orderCalculator;
+    private readonly IMediator _mediator;
     private readonly IProductCatalog _productCatalog;
 
-    public OrderController(IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator, IProductCatalog productCatalog)
+    public OrderController(IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IMediator mediator, IProductCatalog productCatalog)
     {
         _dbContextFactory = dbContextFactory;
         _httpContextAccessor = httpContextAccessor;
-        _orderCalculator = orderCalculator;
+        _mediator = mediator;
         _productCatalog = productCatalog;
     }
 
@@ -72,7 +74,7 @@ public class OrderController : ControllerBase
             o.UserId = GetUserName();
         });
 
-        var result = await _orderCalculator.CalculateOrder(order);
+        var result = await _mediator.Send(new CalculateOrderCommand() { Order = order });
 
         using var orderDbContext = _dbContextFactory.CreateDbContext();
         orderDbContext.Add(order);
@@ -91,7 +93,7 @@ public class OrderController : ControllerBase
             o.Status = OrderStatus.Draft;
         });
 
-        var result = await _orderCalculator.CalculateOrder(order);
+        var result = await _mediator.Send(new CalculateOrderCommand() { Order = order });
         return Ok(result);
     }
 }

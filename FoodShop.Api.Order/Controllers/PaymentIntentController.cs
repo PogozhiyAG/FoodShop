@@ -6,6 +6,8 @@ using Stripe;
 using FoodShop.Api.Order.Dto;
 using FoodShop.Api.Order.Dto.Extensions;
 using FoodShop.Api.Order.Model;
+using MediatR;
+using FoodShop.Api.Order.Commands;
 
 namespace FoodShop.Api.Order.Controllers
 {
@@ -16,16 +18,15 @@ namespace FoodShop.Api.Order.Controllers
         private readonly PaymentIntentService _paymentIntentService;
         private readonly IDbContextFactory<OrderDbContext> _dbContextFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IOrderCalculator _orderCalculator;
+        private readonly IMediator _mediator;
 
-        public PaymentIntentController(PaymentIntentService paymentIntentService, IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IOrderCalculator orderCalculator)
+        public PaymentIntentController(PaymentIntentService paymentIntentService, IDbContextFactory<OrderDbContext> dbContextFactory, IHttpContextAccessor httpContextAccessor, IMediator mediator)
         {
             _paymentIntentService = paymentIntentService;
             _dbContextFactory = dbContextFactory;
             _httpContextAccessor = httpContextAccessor;
-            _orderCalculator = orderCalculator;
+            _mediator = mediator;
         }
-
 
         private string GetUserName() => _httpContextAccessor.HttpContext!.User.Identity!.Name!;
 
@@ -41,7 +42,7 @@ namespace FoodShop.Api.Order.Controllers
                 o.UserId = GetUserName();
             });
 
-            var result = await _orderCalculator.CalculateOrder(order);
+            var result = await _mediator.Send(new CalculateOrderCommand() { Order = order });
             orderDbContext.Add(order);
             await orderDbContext.SaveChangesAsync();
 
