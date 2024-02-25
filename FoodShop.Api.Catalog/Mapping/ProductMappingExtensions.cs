@@ -1,4 +1,5 @@
 ﻿using FoodShop.Api.Catalog.Dto;
+using FoodShop.Api.Catalog.Model.Internal;
 using FoodShop.Core.Models;
 
 namespace FoodShop.Api.Catalog.Mapping;
@@ -30,40 +31,40 @@ public static class ProductMappingExtensions
         productDto.Tags.AddRange(product.Tags.Select(r => r.Tag.Name));
     }
 
-    private static void SetupOfferedProductDto(OfferedProductDto offeredProductDto, Product product, ProductPriceStrategyLink offerLink)
+    private static void SetupOfferedProductDto(OfferedProductDto offeredProductDto, ProductCalculationItem item)
     {
-        SetupProductDto(offeredProductDto, product);
-        offeredProductDto.TokenTypeCode = offerLink.TokenTypeCode;
-        offeredProductDto.StrategyName = offerLink.ProductPriceStrategy.Name;
-        offeredProductDto.OfferPrice = offerLink.ProductPriceStrategy.GetAmount(product.Price, 1);
+        SetupProductDto(offeredProductDto, item.Product);
+        offeredProductDto.TokenTypeCode = item.PriceStrategyLink.TokenTypeCode;
+        offeredProductDto.StrategyName = item.PriceStrategyLink.ProductPriceStrategy.Name;
+        offeredProductDto.OfferPrice = item.OfferPrice;
     }
 
-    private static void SetupOfferedProductBatchDto(OfferedProductBatchDto offeredProductBatchDto, Product product, ProductPriceStrategyLink offerLink, int quantity)
+    private static void SetupOfferedProductBatchDto(OfferedProductBatchDto offeredProductBatchDto, ProductCalculationItem item)
     {
-        SetupOfferedProductDto(offeredProductBatchDto, product, offerLink);
-        offeredProductBatchDto.Quantity = quantity;
-        offeredProductBatchDto.Amount = ProductPriceStrategy.Default.GetAmount(product.Price, quantity);
-        offeredProductBatchDto.OfferAmount = offerLink.ProductPriceStrategy.GetAmount(product.Price, quantity);
+        SetupOfferedProductDto(offeredProductBatchDto, item);
+        offeredProductBatchDto.Quantity = item.Quantity;
+        offeredProductBatchDto.Amount = item.Amount;
+        offeredProductBatchDto.OfferAmount = item.OfferAmount;
     }
 
-    public static ProductDto MapToProductDto(this Product product)
+    public static ProductDto MapToProductDto(this ProductCalculationItem item)
     {
         var result = new ProductDto();
-        SetupProductDto(result, product);
+        SetupProductDto(result, item.Product);
         return result;
     }
 
-    public static OfferedProductDto MapToOfferedProductDto(this Product product, ProductPriceStrategyLink offerLink)
+    public static OfferedProductDto MapToOfferedProductDto(this ProductCalculationItem item)
     {
         var result = new OfferedProductDto();
-        SetupOfferedProductDto(result, product, offerLink);
+        SetupOfferedProductDto(result, item);
         return result;
     }
 
-    public static OfferedProductBatchDto MapToOfferedProductBatchDto(this Product product, ProductPriceStrategyLink offerLink, int quantity)
+    public static OfferedProductBatchDto MapToOfferedProductBatchDto(this ProductCalculationItem item)
     {
         var result = new OfferedProductBatchDto();
-        SetupOfferedProductBatchDto(result, product, offerLink, quantity);
+        SetupOfferedProductBatchDto(result, item);
         return result;
     }
 }

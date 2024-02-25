@@ -20,6 +20,8 @@ builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().Al
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<Program>());
+
 builder.Services.AddFoodShopJwt();
 
 builder.Services.AddDbContextFactory<FoodShopDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
