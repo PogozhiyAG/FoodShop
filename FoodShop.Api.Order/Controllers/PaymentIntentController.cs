@@ -25,7 +25,6 @@ namespace FoodShop.Api.Order.Controllers
         public async Task<IActionResult> Create([FromBody] CreateOrderRequest createOrderRequest)
         {
             var command = new CreateCheckoutCommand() {
-                UserId = GetUserName(),
                 CreateOrderRequest = createOrderRequest
             };
 

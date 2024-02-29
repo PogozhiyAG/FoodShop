@@ -11,13 +11,13 @@ public class CorrectionCalculationStage : IOrderCalculationStage
 
     private readonly IOrderAmountCorrectionsProvider _orderAmountCorrectionsProvider;
     private readonly ICustomerProfile _customerProfile;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IAuthenticationContext _authenticationContext;
 
-    public CorrectionCalculationStage(IOrderAmountCorrectionsProvider orderAmountCorrectionsProvider, ICustomerProfile customerProfile, IHttpContextAccessor httpContextAccessor)
+    public CorrectionCalculationStage(IOrderAmountCorrectionsProvider orderAmountCorrectionsProvider, ICustomerProfile customerProfile, IAuthenticationContext authenticationContext)
     {
         _orderAmountCorrectionsProvider = orderAmountCorrectionsProvider;
         _customerProfile = customerProfile;
-        _httpContextAccessor = httpContextAccessor;
+        _authenticationContext = authenticationContext;
     }
 
     public async Task<IEnumerable<OrderCalculation>> GetCalculation(OrderCalculationContext orderCalculationContext)
@@ -46,7 +46,7 @@ public class CorrectionCalculationStage : IOrderCalculationStage
 
     private async Task<IEnumerable<string>> GetTokenTypes()
     {
-        var principal = _httpContextAccessor.HttpContext!.User;
+        var principal = _authenticationContext.User;
         var isAnonymous = principal.Claims.Any(c => c.Type == ClaimTypes.Anonymous);
         if (isAnonymous)
         {

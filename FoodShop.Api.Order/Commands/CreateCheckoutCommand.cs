@@ -8,7 +8,6 @@ namespace FoodShop.Api.Order.Commands;
 
 public class CreateCheckoutCommand : IRequest<CreateCheckoutCommandResult>
 {
-    public required string UserId { get; set; }
     public required CreateOrderRequest CreateOrderRequest{ get; set; }
 }
 

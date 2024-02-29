@@ -2,6 +2,7 @@
 using FoodShop.Api.Order.Data;
 using FoodShop.Api.Order.Dto.Extensions;
 using FoodShop.Api.Order.Model;
+using FoodShop.Api.Order.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
@@ -13,12 +14,14 @@ public class CreateCheckoutCommandHandler : IRequestHandler<CreateCheckoutComman
     private readonly PaymentIntentService _paymentIntentService;
     private readonly IDbContextFactory<OrderDbContext> _dbContextFactory;
     private readonly IMediator _mediator;
+    private readonly IAuthenticationContext _authenticationContext;
 
-    public CreateCheckoutCommandHandler(PaymentIntentService paymentIntentService, IDbContextFactory<OrderDbContext> dbContextFactory, IMediator mediator)
+    public CreateCheckoutCommandHandler(PaymentIntentService paymentIntentService, IDbContextFactory<OrderDbContext> dbContextFactory, IMediator mediator, IAuthenticationContext authenticationContext)
     {
         _paymentIntentService = paymentIntentService;
         _dbContextFactory = dbContextFactory;
         _mediator = mediator;
+        _authenticationContext = authenticationContext;
     }
 
     public async Task<CreateCheckoutCommandResult> Handle(CreateCheckoutCommand request, CancellationToken cancellationToken)
@@ -30,7 +33,7 @@ public class CreateCheckoutCommandHandler : IRequestHandler<CreateCheckoutComman
         result.Order = request.CreateOrderRequest.ToOrder(o =>
         {
             o.Status = OrderStatus.Checkout;
-            o.UserId = request.UserId;
+            o.UserId = _authenticationContext.User.Identity.Name;
         });
 
         result.OrderCalculationContext = await _mediator.Send(new CalculateOrderCommand() { Order = result.Order });

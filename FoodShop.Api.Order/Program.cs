@@ -9,6 +9,8 @@ using FoodShop.Catalog.Grpc;
 using Microsoft.Net.Http.Headers;
 using MassTransit;
 using RabbitMQ.Client;
+using FoodShop.Api.Order.Services.MassTransit;
+using FoodShop.Api.Order.Middleware;
 
 //Is this a bug? https://stackoverflow.com/questions/65706167/weird-no-ip-address-could-be-resolved-in-rabbitmq-net-client
 ConnectionFactory.DefaultAddressFamily = System.Net.Sockets.AddressFamily.InterNetwork;
@@ -22,8 +24,11 @@ builder.Services.AddHttpClient();
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddDbContextFactory<OrderDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IAuthenticationContext, AuthenticationContext>();
+
 builder.Services.AddMassTransit(c =>
 {
+    c.AddConsumers(typeof(Program).Assembly);
     c.UsingRabbitMq((context, configurator) =>
     {
         configurator.Host(builder.Configuration["RabbitMq:Host"], builder.Configuration["RabbitMq:VirtualHost"], h =>
@@ -31,7 +36,12 @@ builder.Services.AddMassTransit(c =>
             h.Username(builder.Configuration["RabbitMq:Username"]);
             h.Password(builder.Configuration["RabbitMq:Password"]);
         });
+
+
+        configurator.UseConsumeFilter(typeof(JwtAuthenticationConsumeFilter<>), context);
+
         configurator.ConfigureEndpoints(context);
+
 
     });
 });
@@ -68,12 +78,8 @@ builder.Services
     })
     .AddCallCredentials((context, metadata, sp) =>
     {
-        var _httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-        var auth = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.FirstOrDefault();
-        if (auth != null)
-        {
-            metadata.Add(HeaderNames.Authorization, auth);
-        }
+        var authenticationContext = sp.GetRequiredService<IAuthenticationContext>();
+        metadata.Add(HeaderNames.Authorization, $"Bearer {authenticationContext.Token}");
         return Task.CompletedTask;
     })
     .ConfigureChannel(o =>
@@ -101,6 +107,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<AuthenticationContextFromHttpContextMiddleware>();
 
 using (var db = app.Services.CreateScope().ServiceProvider.GetRequiredService<OrderDbContext>())
 {
