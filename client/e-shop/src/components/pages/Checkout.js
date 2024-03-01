@@ -16,12 +16,12 @@ export const Checkout = () => {
 
     const {getData} = useHttpClient();
 
-    const throttling = useThrottling({key: 'create-payment-intent', delay: 200});
+    const throttling = useThrottling({key: 'order-checkout', delay: 200});
 
     //TODO: Auth
     useEffect(() => {
         throttling(() => {
-            getData("https://localhost:14443/PaymentIntent", {
+            getData("https://localhost:14443/Order/checkout", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(order.createCalculationRequest()),

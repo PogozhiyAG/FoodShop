@@ -16,8 +16,11 @@ public class AuthenticationContextFromHttpContextMiddleware
         authenticationContext.User = context.User;
 
         var authorizationHeader = context.Request.Headers.Authorization.FirstOrDefault();
-        var token = authorizationHeader!.Substring("Bearer ".Length);
-        authenticationContext.Token = token;
+        if (authorizationHeader != null)
+        {
+            var token = authorizationHeader!.Substring("Bearer ".Length);
+            authenticationContext.Token = token;
+        }
 
         await _next.Invoke(context);
     }
