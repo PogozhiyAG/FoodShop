@@ -36,7 +36,7 @@ builder.Services.AddMassTransit(mt => {
     mt.AddConsumers(Assembly.GetExecutingAssembly());
 });
 
-//TODO Does it really need?
+//TODO Is it really necessary?
 builder.Services.AddDbContext<OrderStateMachineDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
