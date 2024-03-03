@@ -91,7 +91,7 @@ services:
       - foodshopnetwork
 
   messaging:
-    image: rabbitmq:3-management-alpine
+    image: masstransit/rabbitmq
     ports:
       - "15672:15672"
       - "5672:5672"
