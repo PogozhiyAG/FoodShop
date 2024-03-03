@@ -1,0 +1,6 @@
+@FoodShop.Api.Workflow.Order_HostAddress = http://localhost:5004
+
+GET {{FoodShop.Api.Workflow.Order_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
