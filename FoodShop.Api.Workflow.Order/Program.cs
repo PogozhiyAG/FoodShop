@@ -22,10 +22,10 @@ builder.Services.AddMassTransit(mt => {
 
     mt.UsingRabbitMq((context, configurator) =>
     {
-        configurator.Host("localhost", "/", h =>
+        configurator.Host(builder.Configuration["RabbitMq:Host"], builder.Configuration["RabbitMq:VirtualHost"], h =>
         {
-            h.Username("guest");
-            h.Password("guest");
+            h.Username(builder.Configuration["RabbitMq:Username"]);
+            h.Password(builder.Configuration["RabbitMq:Password"]);
         });
 
         configurator.UseDelayedMessageScheduler();
