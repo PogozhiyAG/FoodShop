@@ -1,4 +1,5 @@
-﻿using FoodShop.Api.Warehouse.StateMachine.Timeouts;
+﻿using FoodShop.Api.Warehouse.StateMachine.Activities;
+using FoodShop.Api.Warehouse.StateMachine.Timeouts;
 using FoodShop.MessageContracts.Warehouse;
 using MassTransit;
 
@@ -28,9 +29,10 @@ public class WarehouseOrderStateMachine : MassTransitStateMachine<WarehouseOrder
              .Then(ctx => {
                  ctx.Saga.OrderId = ctx.Message.OrderId;
              })
+             //Hard work
             .Schedule(WarehouseCreateParcelTimeoutSchedule,
-                ctx => ctx.Init<WarehouseCreateParcelTimeoutMessage>(new WarehouseCreateParcelTimeoutMessage() { CorrelationId = ctx.Saga.CorrelationId, ParcelId = Guid.NewGuid() }),
-                ctx => TimeSpan.FromSeconds(10)
+                ctx => ctx.Init<WarehouseCreateParcelTimeoutMessage>(new WarehouseCreateParcelTimeoutMessage() { CorrelationId = ctx.Saga.CorrelationId}),
+                ctx => TimeSpan.FromSeconds(2)
             )
             .TransitionTo(WaitingForParcelCreated)
         );
@@ -38,10 +40,7 @@ public class WarehouseOrderStateMachine : MassTransitStateMachine<WarehouseOrder
 
         During(WaitingForParcelCreated,
             When(WarehouseCreateParcelTimeoutSchedule!.Received)
-            .Then(ctx =>
-            {
-                ctx.Saga.ParcelId = ctx.Message.ParcelId;
-            })
+            .Activity(x => x.OfInstanceType<CreateParcelActivity>())
             .Publish(ctx => new ParcelCreated(
                 OrderId: ctx.Saga.OrderId,
                 ParcelId: ctx.Saga.ParcelId
