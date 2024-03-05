@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "FoodShop.Order.Grpc";
+
+package FoodShop.Order;
+
+
+service OrderService {
+    rpc GetOrder(OrderRequest) returns (OrderResponse);
+}
+
+message OrderRequest {
+    string OrderId = 1;
+}
+
+message OrderItem {
+    string ProductId = 1;
+    int32 Quantity = 2;
+}
+
+message DeliveryInfo {
+    string Address = 1;
+    google.protobuf.Timestamp TimeSlotFrom = 2;
+    google.protobuf.Timestamp TimeSlotTo = 3;
+    string ContactPhone = 4;
+    string ContactName = 5;
+}
+
+message OrderResponse {
+    string Id = 1;
+    string UserId = 2;
+    repeated OrderItem Items = 3;
+    DeliveryInfo DeliveryInfo = 4;
+}

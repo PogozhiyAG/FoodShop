@@ -18,6 +18,8 @@ ConnectionFactory.DefaultAddressFamily = System.Net.Sockets.AddressFamily.InterN
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddGrpc();
+builder.Services.AddGrpcReflection();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
@@ -107,6 +109,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<OrderServiceGrpc>();
+app.MapGrpcReflectionService();
 
 app.UseMiddleware<AuthenticationContextFromHttpContextMiddleware>();
 

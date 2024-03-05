@@ -1,6 +1,5 @@
 ﻿using FoodShop.Api.Order.Commands;
 using FoodShop.Api.Order.Data;
-using FoodShop.MessageContracts.Order;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +16,8 @@ public class OrderSetStatusPaidCommandHandler(
         using var db = await _dbContextFactory.CreateDbContextAsync();
 
         var orderPaymentIntent = await db.OrderPaymentIntents
-            .Include(pi => pi.Order)
+            .Include(pi => pi.Order).ThenInclude(o => o.Items)
+            .Include(pi => pi.Order).ThenInclude(o => o.DeliveryInfo)
             .FirstOrDefaultAsync(pi => pi.PaymentIntentId == request.PaymentIntentId);
 
         if (orderPaymentIntent?.Order != null)
@@ -25,10 +25,19 @@ public class OrderSetStatusPaidCommandHandler(
             orderPaymentIntent.Order.Status = Model.OrderStatus.Paid;
             await db.SaveChangesAsync();
 
-            await _publishEndpoint.Publish(new OrderPaid(
-                OrderId: orderPaymentIntent.Order.Id,
-                Moment: DateTime.Now
-            ));
+            await _publishEndpoint.Publish(orderPaymentIntent.Order.MapToOrderPaidMessage());
         }
+    }
+}
+
+
+public static class OrderMappingExtensionsTODORefactoring
+{
+    public static MessageContracts.Order.OrderPaid MapToOrderPaidMessage(this Model.Order order)
+    {
+        return new MessageContracts.Order.OrderPaid(
+            OrderId: order.Id,
+            Moment: DateTime.Now
+        );
     }
 }

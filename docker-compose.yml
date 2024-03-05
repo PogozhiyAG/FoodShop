@@ -23,6 +23,7 @@ services:
     ports:
       - "14080:80"
       - "14443:443"
+      - "14090:90"
     networks:
       - foodshopnetwork
 

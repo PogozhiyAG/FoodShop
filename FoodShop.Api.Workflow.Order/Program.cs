@@ -1,11 +1,16 @@
 using FoodShop.Api.Workflow.Order;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 using System.Reflection;
+
+//Is this a bug? https://stackoverflow.com/questions/65706167/weird-no-ip-address-could-be-resolved-in-rabbitmq-net-client
+ConnectionFactory.DefaultAddressFamily = System.Net.Sockets.AddressFamily.InterNetwork;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -43,6 +48,8 @@ builder.Services.AddDbContext<OrderStateMachineDbContext>(o => o.UseSqlServer(bu
 
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
