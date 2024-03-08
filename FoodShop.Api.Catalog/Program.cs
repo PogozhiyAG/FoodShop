@@ -22,6 +22,7 @@ builder.Services.AddResponseCompression(o =>
 builder.Services.AddGraphQLServer()
     .AddFiltering()
     .AddProjections()
+    .AddSorting()
     .AddAuthorization()
     .RegisterDbContext<FoodShopDbContext>(DbContextKind.Pooled)
     .AddQueryType<ProductsQuery>();

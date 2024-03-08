@@ -90,9 +90,12 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
     {
         yield return (EntityTypeCode.Product, product.Id);
 
-        foreach (var tag in product.Tags)
+        if(product.Tags != null)
         {
-            yield return (EntityTypeCode.Tag, tag.TagId);
+            foreach (var tag in product.Tags)
+            {
+                yield return (EntityTypeCode.Tag, tag.TagId);
+            }
         }
 
         if (product.CategoryId.HasValue)

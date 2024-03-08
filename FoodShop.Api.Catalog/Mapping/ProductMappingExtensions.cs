@@ -28,7 +28,10 @@ public static class ProductMappingExtensions
         productDto.Popularity = product.Popularity;
         productDto.CustomerRating = product.CustomerRating;
         productDto.Price = product.Price;
-        productDto.Tags.AddRange(product.Tags.Select(r => r.Tag.Name));
+        if(product.Tags != null)
+        {
+            productDto.Tags.AddRange(product.Tags.Select(r => r.Tag.Name));
+        }        
     }
 
     private static void SetupOfferedProductDto(OfferedProductDto offeredProductDto, ProductCalculationItem item)

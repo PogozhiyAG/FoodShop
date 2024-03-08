@@ -1,4 +1,6 @@
 ﻿using FoodShop.Api.Catalog.Commands;
+using FoodShop.Api.Catalog.Dto;
+using FoodShop.Api.Catalog.Mapping;
 using FoodShop.Api.Catalog.Model;
 using FoodShop.Core.Models;
 using FoodShop.Infrastructure.Data;
@@ -38,11 +40,14 @@ public class ProductsQuery
     }
 
     //TODO: finish this
+    //[UsePaging]
     [UseProjection]
-    public IQueryable<Product> GetProd(
+    [UseFiltering]
+    [UseSorting]
+    public async Task<IQueryable<Product>> GetProd(
         [Service] FoodShopDbContext _db
     )
     {
-        return _db.Products.Take(10);
+        return _db.Products.Take(100);
     }
 }
