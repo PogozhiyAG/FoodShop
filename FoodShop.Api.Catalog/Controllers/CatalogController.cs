@@ -1,45 +1,26 @@
 ﻿using FoodShop.Api.Catalog.Model;
-using FoodShop.Api.Catalog.Services;
 using FoodShop.Infrastructure.Data;
 using FoodShop.Api.Catalog.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using FoodShop.Core.Models;
 using FoodShop.Api.Catalog.Extensions;
 using MediatR;
-using Azure.Core;
+using FoodShop.Api.Catalog.Commands;
 
 namespace FoodShop.Api.Catalog.Controllers;
 
 [Authorize]
 [Route("[controller]")]
 [ApiController]
-public class CatalogController : ControllerBase
+public class CatalogController (
+    IDbContextFactory<FoodShopDbContext> _dbContextFactory,
+    IMediator _mediator
+) : ControllerBase
 {
-    private readonly IDbContextFactory<FoodShopDbContext> _dbContextFactory;
-    private readonly IProductPriceStrategyProvider _priceStrategyProvider;
-    private readonly ICustomerProfile _customerProfile;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IMediator _mediator;
-
-    public CatalogController(
-        IDbContextFactory<FoodShopDbContext> dbContextFactory,
-        IProductPriceStrategyProvider priceStrategyProvider,
-        ICustomerProfile customerProfile,
-        IHttpContextAccessor httpContextAccessor,
-        IMediator mediator)
-    {
-        _dbContextFactory = dbContextFactory;
-        _priceStrategyProvider = priceStrategyProvider;
-        _customerProfile = customerProfile;
-        _httpContextAccessor = httpContextAccessor;
-        _mediator = mediator;
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetProducts(
+        int? Id,
         int? categoryId,
         int? brandId,
         int? tagId,
@@ -49,55 +30,21 @@ public class CatalogController : ControllerBase
         ProductSortType? sort
     )
     {
-        using var db = await _dbContextFactory.CreateDbContextAsync();
-
-        var q = db.Products.SetupProductQuery();
-
-        if (!string.IsNullOrEmpty(text))
+        var products = await _mediator.Send(new ProductsRequest()
         {
-            q = q.Where(p => EF.Functions.Contains(p.Name, GetFullTextCriteria(text)));
-        }
-
-        if (tagId.HasValue)
-        {
-            q = q.Where(p => p.Tags.Any(tr => tr.TagId == tagId));
-        }
-        if (categoryId.HasValue)
-        {
-            q = q.Where(p => p.CategoryId == categoryId.Value);
-        }
-        if (brandId.HasValue)
-        {
-            q = q.Where(p => p.BrandId == brandId.Value);
-        }
-
-        if (!sort.HasValue)
-        {
-            sort = ProductSortType.Popularity;
-        }
-        switch (sort)
-        {
-            case ProductSortType.Popularity: q = q.OrderByDescending(p => p.Popularity).ThenByDescending(p => p.Id); break;
-            case ProductSortType.CustomerRank: q = q.OrderByDescending(p => p.CustomerRating).ThenByDescending(p => p.Id); break;
-            case ProductSortType.Price: q = q.OrderByDescending(p => p.Price).ThenByDescending(p => p.Id); break;
-        }
-
-        if (!skip.HasValue)
-        {
-            skip = 0;
-        }
-        if (!take.HasValue)
-        {
-            take = 50;
-        }
-
-        q = q
-            .Skip(skip.Value)
-            .Take(take.Value);
+            Id = Id,
+            CategoryId = categoryId,
+            BrandId = brandId,
+            TagId = tagId,
+            Text = text,
+            Skip = skip,
+            Take = take,
+            Sort = sort
+        });
 
         var productCalculationItems = await _mediator.Send(new Commands.ProductsCalculationRequest()
         {
-            Products = q
+            Products = products
         });
 
         var result = productCalculationItems
@@ -131,12 +78,5 @@ public class CatalogController : ControllerBase
             .ToList();
 
         return Ok(items);
-    }
-
-
-    private string GetFullTextCriteria(string text)
-    {
-        text = text.Replace("~", " ");
-        return string.Join(" ~ ", text.Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(w => $"\"{w}*\""));
     }
 }

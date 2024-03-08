@@ -1,3 +1,4 @@
+using FoodShop.Api.Catalog.GraphQL;
 using FoodShop.Api.Catalog.Services;
 using FoodShop.BuildingBlocks.Configuration.Security;
 using FoodShop.Infrastructure.Data;
@@ -11,10 +12,19 @@ builder.Services.AddGrpcReflection();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddResponseCompression(o =>
 {
     o.EnableForHttps = true;
 });
+
+
+builder.Services.AddGraphQLServer()
+    .AddProjections()
+    .AddAuthorization()
+    .RegisterDbContext<FoodShopDbContext>(DbContextKind.Pooled)
+    .AddQueryType<ProductsQuery>();
+
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 builder.Services.AddEndpointsApiExplorer();
@@ -53,5 +63,8 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapGrpcService<ProductCalculatorGrpcService>();
 app.MapGrpcReflectionService();
+app.MapGraphQL();
+app.MapGraphQLSchema();
+
 
 app.Run();
