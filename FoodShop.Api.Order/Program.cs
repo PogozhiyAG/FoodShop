@@ -11,6 +11,8 @@ using MassTransit;
 using RabbitMQ.Client;
 using FoodShop.Api.Order.Services.MassTransit;
 using FoodShop.Api.Order.Middleware;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using FoodShop.Api.Order.Configuration;
 
 //Is this a bug? https://stackoverflow.com/questions/65706167/weird-no-ip-address-could-be-resolved-in-rabbitmq-net-client
 ConnectionFactory.DefaultAddressFamily = System.Net.Sockets.AddressFamily.InterNetwork;
@@ -23,10 +25,15 @@ builder.Services.AddGrpcReflection();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddDbContextFactory<OrderDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+builder.Services.AddFoodShopJwt();
 builder.Services.AddScoped<IAuthenticationContext, AuthenticationContext>();
+
 
 builder.Services.AddMassTransit(c =>
 {
@@ -39,35 +46,16 @@ builder.Services.AddMassTransit(c =>
             h.Password(builder.Configuration["RabbitMq:Password"]);
         });
 
-
         configurator.UseConsumeFilter(typeof(JwtAuthenticationConsumeFilter<>), context);
 
         configurator.ConfigureEndpoints(context);
-
-
     });
 });
 
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<Program>());
 
-builder.Services.AddFoodShopJwt();
+builder.Services.AddOrderCalculation();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-
-
-//builder.Services.AddScoped<IProductCatalog, ProductCatalog>();
-builder.Services.AddScoped<IProductCatalog, ProductCatalogGrpc>();
-builder.Services.AddScoped<IOrderCalculator, OrderCalculator>();
-builder.Services.AddScoped<ICustomerProfile, CustomerProfile>();
-
-builder.Services.AddSingleton<IOrderAmountCorrectionsProvider, OrderAmountCorrectionsProvider>();
-
-builder.Services.AddKeyedScoped<IOrderCalculationStage, ProductCalculationStage>(ProductCalculationStage.DEFAULT_SERVICE_KEY);
-builder.Services.AddKeyedScoped<IOrderCalculationStage, PackingServiceCalculationStage>(PackingServiceCalculationStage.DEFAULT_SERVICE_KEY);
-builder.Services.AddKeyedScoped<IOrderCalculationStage, DeliveryCalculationStage>(DeliveryCalculationStage.DEFAULT_SERVICE_KEY);
-builder.Services.AddKeyedScoped<IOrderCalculationStage, CorrectionCalculationStage>(CorrectionCalculationStage.DEFAULT_SERVICE_KEY);
 
 
 

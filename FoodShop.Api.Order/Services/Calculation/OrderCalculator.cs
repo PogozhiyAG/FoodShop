@@ -1,5 +1,4 @@
-﻿using FoodShop.Api.Order.Model;
-using FoodShop.Api.Order.Services.Calculation.Stage;
+﻿using FoodShop.Api.Order.Services.Calculation.Stage;
 
 namespace FoodShop.Api.Order.Services.Calculation;
 
@@ -9,17 +8,8 @@ public interface IOrderCalculator
 }
 
 
-public class OrderCalculator : IOrderCalculator
+public class OrderCalculator(IServiceProvider _serviceProvider) : IOrderCalculator
 {
-    private readonly IConfiguration _configuration;
-    private readonly IServiceProvider _serviceProvider;
-
-    public OrderCalculator(IConfiguration configuration, IServiceProvider serviceProvider)
-    {
-        _configuration = configuration;
-        _serviceProvider = serviceProvider;
-    }
-
     public async Task<OrderCalculationContext> CalculateOrder(Model.Order order)
     {
         order.OrderCalculations.Clear();
@@ -29,12 +19,9 @@ public class OrderCalculator : IOrderCalculator
             Order = order
         };
 
-        var stageKeys = _configuration["OrderCalculator:Stages"]?.Split(",", StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var stageKey in stageKeys)
+        foreach (var stage in _serviceProvider.GetServices<IOrderCalculationStage>())
         {
-            var calculationStage = _serviceProvider.GetRequiredKeyedService<IOrderCalculationStage>(stageKey.Trim());
-            var calculations = await calculationStage.GetCalculation(context);
+            var calculations = await stage.GetCalculation(context);
 
             foreach (var calculation in calculations)
             {
