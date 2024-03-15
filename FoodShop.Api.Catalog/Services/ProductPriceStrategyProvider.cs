@@ -5,6 +5,9 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FoodShop.Api.Catalog.Services;
 
+/// <summary>
+/// Finds price strategy for a product for giving token types
+/// </summary>
 public interface IProductPriceStrategyProvider
 {
     ProductPriceStrategyLink GetStrategyLink(Product product, IEnumerable<string> tokenTypeIds);
@@ -15,6 +18,8 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
     private readonly IDbContextFactory<FoodShopDbContext> _dbContextFactory;
     private readonly IMemoryCache _cache;
     private readonly SemaphoreSlim _cacheLock = new SemaphoreSlim(1, 1);
+
+    public const string ProductPriceStrategiesCacheKey = "PRODUCT_PRICE_STRATEGIES";
 
     public ProductPriceStrategyProvider(IDbContextFactory<FoodShopDbContext> dbContextFactory, IMemoryCache cache)
     {
@@ -28,12 +33,12 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
         var strategies = GetStrategies();
 
-        var fullTokenTypeIds = tokenTypeIds.Append(null).Distinct(); ;
+        var fullTokenTypeIds = tokenTypeIds.Append(null).Distinct();
         foreach (var tokenTypeId in fullTokenTypeIds)
         {
-            foreach (var referenceId in GetReferencesFromProduct(product))
+            foreach (var referenceId in product.ExtractEntityReferences())
             {
-                var key = new ValueTuple<string?, EntityTypeCode, int>(tokenTypeId, referenceId.Item1, referenceId.Item2);
+                var key = new StrategyKey(tokenTypeId, referenceId);
                 if (strategies.TryGetValue(key, out var value))
                 {
                     if (value.Priority > result.Priority)
@@ -47,9 +52,9 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
         return result;
     }
 
-    private Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink> GetStrategies()
+    private Dictionary<StrategyKey, ProductPriceStrategyLink> GetStrategies()
     {
-        if (_cache.TryGetValue(nameof(GetStrategies), out Dictionary<(string?, EntityTypeCode, int), ProductPriceStrategyLink>? value))
+        if (_cache.TryGetValue(ProductPriceStrategiesCacheKey, out Dictionary<StrategyKey, ProductPriceStrategyLink>? value))
         {
             return value!;
         }
@@ -59,7 +64,7 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
             {
                 _cacheLock.Wait();
 
-                if (_cache.TryGetValue(nameof(GetStrategies), out value))
+                if (_cache.TryGetValue(ProductPriceStrategiesCacheKey, out value))
                 {
                     return value!;
                 }
@@ -69,9 +74,9 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
 
                     value = db.ProductPriceStrategyLinks.AsNoTracking()
                         .Include(s => s.ProductPriceStrategy)
-                        .ToDictionary(s => new ValueTuple<string?, EntityTypeCode, int>(s.TokenTypeCode, s.ReferenceType, s.ReferenceId));
+                        .ToDictionary(s => s.MapToStrategyKey());
 
-                    _cache.Set(nameof(GetStrategies), value, new MemoryCacheEntryOptions()
+                    _cache.Set(ProductPriceStrategiesCacheKey, value, new MemoryCacheEntryOptions()
                     {
                         AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
                     });
@@ -85,27 +90,49 @@ public class ProductPriceStrategyProvider : IProductPriceStrategyProvider
             }
         }
     }
+}
 
-    private IEnumerable<ValueTuple<EntityTypeCode, int>> GetReferencesFromProduct(Product product)
+
+
+
+internal record struct EntityReference(
+   EntityTypeCode ReferenceType,
+   int ReferenceId
+);
+
+internal record struct StrategyKey(
+    string? TokenTypeCode,
+    EntityReference EntityReference
+);
+
+internal static class ProductPriceStrategyLinkExtensions
+{
+    public static StrategyKey MapToStrategyKey(this ProductPriceStrategyLink productPriceStrategyLink) =>
+        new StrategyKey(productPriceStrategyLink.TokenTypeCode, new EntityReference(productPriceStrategyLink.ReferenceType, productPriceStrategyLink.ReferenceId));
+}
+
+internal static class ProductExtensions
+{
+    public static IEnumerable<EntityReference> ExtractEntityReferences(this Product product)
     {
-        yield return (EntityTypeCode.Product, product.Id);
+        yield return new EntityReference(EntityTypeCode.Product, product.Id);
 
-        if(product.Tags != null)
+        if (product.Tags != null)
         {
             foreach (var tag in product.Tags)
             {
-                yield return (EntityTypeCode.Tag, tag.TagId);
+                yield return new EntityReference(EntityTypeCode.Tag, tag.TagId);
             }
         }
 
         if (product.CategoryId.HasValue)
         {
-            yield return (EntityTypeCode.ProductCategory, product.CategoryId.Value);
+            yield return new EntityReference(EntityTypeCode.ProductCategory, product.CategoryId.Value);
         }
 
         if (product.BrandId.HasValue)
         {
-            yield return (EntityTypeCode.Brand, product.BrandId.Value);
+            yield return new EntityReference(EntityTypeCode.Brand, product.BrandId.Value);
         }
     }
 }
