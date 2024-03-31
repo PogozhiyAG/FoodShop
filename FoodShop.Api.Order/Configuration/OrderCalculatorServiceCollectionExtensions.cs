@@ -17,10 +17,10 @@ public static class OrderCalculatorServiceCollectionExtensions
         services.TryAddSingleton<IOrderAmountCorrectionsProvider, OrderAmountCorrectionsProvider>();
 
         //the order matters
-        services.TryAddScoped<IOrderCalculationStage, ProductCalculationStage>();
-        services.TryAddScoped<IOrderCalculationStage, PackingServiceCalculationStage>();
-        services.TryAddScoped<IOrderCalculationStage, DeliveryCalculationStage>();
-        services.TryAddScoped<IOrderCalculationStage, CorrectionCalculationStage>();
+        services.AddScoped<IOrderCalculationStage, ProductCalculationStage>();
+        services.AddScoped<IOrderCalculationStage, PackingServiceCalculationStage>();
+        services.AddScoped<IOrderCalculationStage, DeliveryCalculationStage>();
+        services.AddScoped<IOrderCalculationStage, CorrectionCalculationStage>();
 
         return services;
     }

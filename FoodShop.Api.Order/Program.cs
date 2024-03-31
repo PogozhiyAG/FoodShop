@@ -13,6 +13,7 @@ using FoodShop.Api.Order.Services.MassTransit;
 using FoodShop.Api.Order.Middleware;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using FoodShop.Api.Order.Configuration;
+using FoodShop.Api.Order.Behaviors;
 
 //Is this a bug? https://stackoverflow.com/questions/65706167/weird-no-ip-address-could-be-resolved-in-rabbitmq-net-client
 ConnectionFactory.DefaultAddressFamily = System.Net.Sockets.AddressFamily.InterNetwork;
@@ -52,7 +53,11 @@ builder.Services.AddMassTransit(c =>
     });
 });
 
-builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<Program>());
+builder.Services.AddMediatR(c => {
+    c.RegisterServicesFromAssemblyContaining<Program>();
+
+    c.AddOpenBehavior(typeof(RequestLoggingPipelineBehavior<,>));
+});
 
 builder.Services.AddOrderCalculation();
 
