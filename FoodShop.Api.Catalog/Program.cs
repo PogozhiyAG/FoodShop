@@ -1,8 +1,17 @@
+using FoodShop.Api.Catalog.Commands;
 using FoodShop.Api.Catalog.GraphQL;
 using FoodShop.Api.Catalog.Services;
 using FoodShop.BuildingBlocks.Configuration.Security;
+using FoodShop.Core.Models;
 using FoodShop.Infrastructure.Data;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using FoodShop.Api.Catalog.Behaviors;
+
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using Azure.Core;
+using Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +22,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 
+//TODO: Test
 builder.Services.AddResponseCompression(o =>
 {
     o.EnableForHttps = true;
@@ -32,14 +42,34 @@ builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().Al
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<Program>());
+builder.Services.AddMediatR(c => {
+    c.RegisterServicesFromAssemblyContaining<Program>();
+    c.AddOpenBehavior(typeof(CachingPipelineBehavior<,>));
+});
+
+builder.Services.Configure<CachingBehaviorOptions<ProductPriceStrategyLinksRequest, ProductPriceStrategyLinksResponse>>(options =>
+{
+    options.GetCacheKey = _ => "PRODUCT_PRICE_STRATEGY_LINKS";
+    options.GetMemoryCacheEntryOptions = (_, _) => new MemoryCacheEntryOptions
+    {
+        AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
+    };
+});
+builder.Services.Configure<CachingBehaviorOptions<UserTokenTypesRequest, UserTokenTypesResponse>>(options =>
+{
+    options.GetCacheKey = request => $"USER_TOKEN_TYPES/{request.UserName}";
+    options.GetMemoryCacheEntryOptions = (_, _) => new MemoryCacheEntryOptions
+    {
+        AbsoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(45)
+    };
+});
 
 builder.Services.AddFoodShopJwt();
 
 builder.Services.AddDbContextFactory<FoodShopDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
 builder.Services.AddSingleton<IProductPriceStrategyProvider, ProductPriceStrategyProvider>();
-builder.Services.AddScoped<ICustomerProfile, CustomerProfile>();
 builder.Services.AddScoped<IUserTokenTypesProvider, HttpContextUserTokenTypesProvider>();
 
 

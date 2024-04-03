@@ -25,7 +25,7 @@ public class ProductsCalculationRequestHandler : IRequestHandler<ProductsCalcula
             .Select(p => new
             {
                 Product = p,
-                PriceStrategyLink = _priceStrategyProvider.GetStrategyLink(p, tokenTypes),
+                PriceStrategyLink = _priceStrategyProvider.GetStrategyLink(p, tokenTypes), //TODO make async
                 Quantity = request.GetProductQuantity != null ? request.GetProductQuantity(p) : 1
             })
             .Select(d => new ProductCalculationItem()

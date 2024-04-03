@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using FoodShop.Api.Catalog.Commands;
+using MediatR;
+using System.Security.Claims;
 
 namespace FoodShop.Api.Catalog.Services;
 
@@ -8,17 +10,8 @@ public interface IUserTokenTypesProvider
 }
 
 
-public class HttpContextUserTokenTypesProvider : IUserTokenTypesProvider
+public class HttpContextUserTokenTypesProvider(IHttpContextAccessor _httpContextAccessor, IMediator _mediator) : IUserTokenTypesProvider
 {
-    private readonly ICustomerProfile _customerProfile;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public HttpContextUserTokenTypesProvider(ICustomerProfile customerProfile, IHttpContextAccessor httpContextAccessor)
-    {
-        _customerProfile = customerProfile;
-        _httpContextAccessor = httpContextAccessor;
-    }
-
     public async Task<IEnumerable<string>> GetUserTokenTypes()
     {
         var principal = _httpContextAccessor.HttpContext!.User;
@@ -34,6 +27,7 @@ public class HttpContextUserTokenTypesProvider : IUserTokenTypesProvider
             return Array.Empty<string>();
         }
 
-        return await _customerProfile.GetTokenTypes(userName);
+        var response = await _mediator.Send(new UserTokenTypesRequest() { UserName = userName });
+        return response.TokenTypes!;
     }
 }

@@ -41,7 +41,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Warehouse", "F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.ConsoleShop", "FoodShop.ConsoleShop\FoodShop.ConsoleShop.csproj", "{C622ACE2-50E9-4978-8572-5EE5017E99D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodShop.Api.Workflow.Order", "FoodShop.Api.Workflow.Order\FoodShop.Api.Workflow.Order.csproj", "{8349365C-B2CB-44EF-AA3F-D7D6F01F2E8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodShop.Api.Workflow.Order", "FoodShop.Api.Workflow.Order\FoodShop.Api.Workflow.Order.csproj", "{8349365C-B2CB-44EF-AA3F-D7D6F01F2E8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodShop.Api.Catalog.Tests", "..\FoodShop.Api.Catalog.Tests\FoodShop.Api.Catalog.Tests.csproj", "{88692DD3-E72B-479C-8C0F-5D127922D9B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +107,10 @@ Global
 		{8349365C-B2CB-44EF-AA3F-D7D6F01F2E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8349365C-B2CB-44EF-AA3F-D7D6F01F2E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8349365C-B2CB-44EF-AA3F-D7D6F01F2E8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88692DD3-E72B-479C-8C0F-5D127922D9B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88692DD3-E72B-479C-8C0F-5D127922D9B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88692DD3-E72B-479C-8C0F-5D127922D9B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88692DD3-E72B-479C-8C0F-5D127922D9B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
