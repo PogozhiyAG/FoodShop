@@ -10,13 +10,13 @@ namespace FoodShop.Api.Catalog.CommandHandlers;
 
 public class ProductsRequestHandler(FoodShopDbContext dbContext) : IRequestHandler<ProductsRequest, IQueryable<Product>>
 {
-    public async Task<IQueryable<Product>> Handle(ProductsRequest request, CancellationToken cancellationToken)
+    public Task<IQueryable<Product>> Handle(ProductsRequest request, CancellationToken cancellationToken)
     {
         var result = dbContext.Products.SetupProductQuery();
 
         if (!string.IsNullOrEmpty(request.Text))
         {
-            result = result.Where(p => EF.Functions.Contains(p.Name, GetFullTextCriteria(request.Text)));
+            result = result.Where(p => EF.Functions.Contains(p.Name!, GetFullTextCriteria(request.Text)));
         }
         if (request.Id.HasValue)
         {
@@ -47,7 +47,7 @@ public class ProductsRequestHandler(FoodShopDbContext dbContext) : IRequestHandl
             .Skip(request.Skip ?? 0)
             .Take(request.Take ?? 50);
 
-        return result;
+        return Task.FromResult(result);
     }
 
     private static string GetFullTextCriteria(string text)

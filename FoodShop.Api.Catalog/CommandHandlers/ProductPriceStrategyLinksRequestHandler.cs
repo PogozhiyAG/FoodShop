@@ -19,7 +19,7 @@ public class ProductPriceStrategyLinksRequestHandler(IDbContextFactory<FoodShopD
             .ToDictionary(l => l.MapToStrategyKey());
 
         return new ProductPriceStrategyLinksResponse() {
-            Result = result
+            StrategyLinks = result
         };
     }
 }

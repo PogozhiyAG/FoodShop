@@ -9,17 +9,14 @@ namespace FoodShop.Api.Catalog.Services;
 /// </summary>
 public interface IProductPriceStrategyProvider
 {
-    ProductPriceStrategyLink GetStrategyLink(Product product, IEnumerable<string> tokenTypeIds);
+    ProductPriceStrategyLink GetStrategyLink(Product product, IEnumerable<string> tokenTypeIds, Dictionary<StrategyKey, ProductPriceStrategyLink> strategiesLinksDictionary);
 }
 
-public class ProductPriceStrategyProvider(IMediator _mediator) : IProductPriceStrategyProvider
+public class ProductPriceStrategyProvider() : IProductPriceStrategyProvider
 {
-    public ProductPriceStrategyLink GetStrategyLink(Product product, IEnumerable<string> tokenTypeIds)
+    public ProductPriceStrategyLink GetStrategyLink(Product product, IEnumerable<string> tokenTypeIds, Dictionary<StrategyKey, ProductPriceStrategyLink> strategiesLinksDictionary)
     {
         ProductPriceStrategyLink result = ProductPriceStrategyLink.Default;
-
-        //TODO move to parameter?
-        var strategiesLinksDictionary = _mediator.Send(new ProductPriceStrategyLinksRequest()).Result.Result;
 
         foreach (var tokenTypeId in tokenTypeIds.Append(null))
         {

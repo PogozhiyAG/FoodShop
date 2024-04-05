@@ -2,16 +2,12 @@ using FoodShop.Api.Catalog.Commands;
 using FoodShop.Api.Catalog.GraphQL;
 using FoodShop.Api.Catalog.Services;
 using FoodShop.BuildingBlocks.Configuration.Security;
-using FoodShop.Core.Models;
 using FoodShop.Infrastructure.Data;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using FoodShop.Api.Catalog.Behaviors;
-
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Azure.Core;
-using Azure;
+using FoodShop.Api.Catalog.Options;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,23 +40,23 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediatR(c => {
     c.RegisterServicesFromAssemblyContaining<Program>();
-    c.AddOpenBehavior(typeof(CachingPipelineBehavior<,>));
+    c.AddOpenBehavior(typeof(MemoryCachingPipelineBehavior<,>), ServiceLifetime.Singleton);
 });
 
-builder.Services.Configure<CachingBehaviorOptions<ProductPriceStrategyLinksRequest, ProductPriceStrategyLinksResponse>>(options =>
+builder.Services.Configure<MemoryCachingBehaviorOptions<ProductPriceStrategyLinksRequest>>(options =>
 {
     options.GetCacheKey = _ => "PRODUCT_PRICE_STRATEGY_LINKS";
-    options.GetMemoryCacheEntryOptions = (_, _) => new MemoryCacheEntryOptions
+    options.GetMemoryCacheEntryOptions = _ => new MemoryCacheEntryOptions
     {
-        AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10)
+        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
     };
 });
-builder.Services.Configure<CachingBehaviorOptions<UserTokenTypesRequest, UserTokenTypesResponse>>(options =>
+builder.Services.Configure<MemoryCachingBehaviorOptions<UserTokenTypesRequest>>(options =>
 {
     options.GetCacheKey = request => $"USER_TOKEN_TYPES/{request.UserName}";
-    options.GetMemoryCacheEntryOptions = (_, _) => new MemoryCacheEntryOptions
+    options.GetMemoryCacheEntryOptions = _ => new MemoryCacheEntryOptions
     {
-        AbsoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(45)
+        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(45)
     };
 });
 

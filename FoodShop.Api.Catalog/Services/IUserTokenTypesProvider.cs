@@ -10,6 +10,7 @@ public interface IUserTokenTypesProvider
 }
 
 
+//TODO Consider merge this class with UserTokenTypesRequestHandler
 public class HttpContextUserTokenTypesProvider(IHttpContextAccessor _httpContextAccessor, IMediator _mediator) : IUserTokenTypesProvider
 {
     public async Task<IEnumerable<string>> GetUserTokenTypes()

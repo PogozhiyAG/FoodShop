@@ -10,5 +10,5 @@ public class ProductPriceStrategyLinksRequest : IRequest<ProductPriceStrategyLin
 
 public class ProductPriceStrategyLinksResponse
 {
-    public Dictionary<StrategyKey, ProductPriceStrategyLink> Result { get; set; }
+    public required Dictionary<StrategyKey, ProductPriceStrategyLink> StrategyLinks { get; init; }
 }

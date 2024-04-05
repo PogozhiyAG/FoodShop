@@ -41,13 +41,13 @@ public class ProductsQuery
 
     //TODO: finish this
     //[UsePaging]
-    [UseProjection]
-    [UseFiltering]
-    [UseSorting]
-    public async Task<IQueryable<Product>> GetProd(
-        [Service] FoodShopDbContext _db
-    )
-    {
-        return _db.Products.Take(100);
-    }
+//    [UseProjection]
+//    [UseFiltering]
+//    [UseSorting]
+//    public async Task<IQueryable<Product>> GetProd(
+//        [Service] FoodShopDbContext _db
+//    )
+//    {
+//        return _db.Products.Take(100);
+//    }
 }
