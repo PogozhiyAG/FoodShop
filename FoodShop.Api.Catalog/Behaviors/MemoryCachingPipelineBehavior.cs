@@ -39,13 +39,11 @@ public class MemoryCachingPipelineBehavior<TRequest, TResponse> (
             var wrapper = async () =>
             {
                 await Task.Yield();
-                return await next();
+                return await next().ConfigureAwait(false);
             };
 
             responseTask = wrapper();
-
             var cacheOptions = _options.Value.GetMemoryCacheEntryOptions!(request);
-
             //The task here is not a result. This is data in cache.
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             _cache.Set(key, responseTask, cacheOptions);
