@@ -16,6 +16,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+builder.Services.Configure<PasswordHasherOptions>(options =>
+{
+    options.IterationCount = 2000;
+});
+
 
 builder.Services.AddFoodShopJwt();
 
